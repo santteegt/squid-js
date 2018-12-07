@@ -64,10 +64,11 @@ export default class Keeper {
                         network = "Kovan"
                         break
                     case 8996:
-                        network = "Ocean_POA_net_local"
+                        network = "Spree"
+                        // network = "ocean_poa_net_local"
                         break
                     case 8995:
-                        network = "Ocean_POA_AWS"
+                        network = "Nile"
                         break
                     default:
                         // Logger.log(`NetworkId ${networkId} not found defaulting`)

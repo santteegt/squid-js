@@ -7,7 +7,7 @@ import Condition from "../ddo/Condition"
 import Contract from "../ddo/Contract"
 import DDO from "../ddo/DDO"
 import Event from "../ddo/Event"
-import EventHandlers from "../ddo/EventHandlers"
+import EventHandler from "../ddo/EventHandler"
 import MetaData from "../ddo/MetaData"
 import PublicKey from "../ddo/PublicKey"
 import Service from "../ddo/Service"
@@ -112,12 +112,12 @@ export default class Ocean {
                         events: [
                             {
                                 name: "ExecuteAgreement",
-                                actorType: ["consumer"],
-                                handlers: {
+                                actorType: "consumer",
+                                handler: {
                                     moduleName: "payment",
                                     functionName: "lockPayment",
                                     version: "0.1",
-                                } as EventHandlers,
+                                } as EventHandler,
                             } as Event,
                         ],
                     } as Contract,

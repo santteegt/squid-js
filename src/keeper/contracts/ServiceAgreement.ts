@@ -25,6 +25,8 @@ export default class ServiceAgreement extends ContractBase {
         ])
     }
 
+    // todo get service agreement consumer
+
     public async getTemplateStatus(templateId: string) {
 
         return this.call("getTemplateStatus", [templateId])
