@@ -1,7 +1,7 @@
 import DDOCondition from "../../ddo/Condition"
 import Dependency from "../../ddo/Dependency"
 import Event from "../../ddo/Event"
-import EventHandlers from "../../ddo/EventHandlers"
+import EventHandler from "../../ddo/EventHandler"
 import MetaData from "../../ddo/MetaData"
 import Parameter from "../../ddo/Parameter"
 import ContractReflector from "../../keeper/ContractReflector"
@@ -108,14 +108,12 @@ export default class ServiceAgreementTemplate extends OceanBase {
             const events: Event[] = [
                 {
                     name: "PaymentReleased",
-                    actorType: [
-                        "consumer",
-                    ],
-                    handlers: {
+                    actorType: "consumer",
+                    handler: {
                         moduleName: "serviceAgreement",
                         functionName: "fulfillAgreement",
                         version: "0.1",
-                    } as EventHandlers,
+                    } as EventHandler,
                 } as Event,
             ]
 
