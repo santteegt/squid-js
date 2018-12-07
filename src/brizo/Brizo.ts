@@ -15,8 +15,8 @@ export default class Brizo {
         return `${this.url}${apiPath}/access/purchase?`
     }
 
-    public getConsumeEndpoint(pubKey: string, serviceId: string, url: string) {
-        return `${this.url}${apiPath}/consume?pubKey=${pubKey}&serviceId=${serviceId}&url=${url}`
+    public getConsumeEndpoint() {
+        return `${this.url}${apiPath}/consume`
     }
 
     public getComputeEndpoint(pubKey: string, serviceId: string, algo: string, container: string) {

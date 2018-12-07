@@ -24,7 +24,10 @@ import ServiceAgreement from "./ServiceAgreements/ServiceAgreement"
 import ServiceAgreementTemplate from "./ServiceAgreements/ServiceAgreementTemplate"
 import Access from "./ServiceAgreements/Templates/Access"
 
+import { saveAs } from "file-saver"
+
 import EventListener from "../keeper/EventListener"
+import WebServiceConnectorProvider from "../utils/WebServiceConnectorProvider"
 
 export default class Ocean {
 
@@ -100,8 +103,7 @@ export default class Ocean {
                 {
                     type: template.templateName,
                     purchaseEndpoint: brizo.getPurchaseEndpoint(),
-                    serviceEndpoint: brizo.getConsumeEndpoint(publisher.getId(),
-                        accessServiceDefinitionId, metadata.base.contentUrls[0]),
+                    serviceEndpoint: brizo.getConsumeEndpoint(),
                     // the id of the service agreement?
                     serviceDefinitionId: accessServiceDefinitionId,
                     // the id of the service agreement template
@@ -186,7 +188,34 @@ export default class Ocean {
                     metadataService.metadata.base.price,
                     consumer,
                 )
-                Logger.log("Paid asset")
+                Logger.log("Completed asset payment, now access should be granted.")
+            })
+            const accessEvent: ContractEvent = EventListener.subscribe(
+                accessService.conditions[1].contractName,
+                accessService.conditions[1].events[1].name, {})
+            accessEvent.listenOnce(async (data) => {
+                Logger.log("Awesome; got a AccessGranted Event. Let's download the asset files.")
+                const webConnector = WebServiceConnectorProvider.getConnector()
+                const contentUrls = await SecretStoreProvider.getSecretStore()
+                    .decryptDocument(id, metadataService.metadata.base.contentUrls[0])
+                const serviceUrl: string = accessService.serviceEndpoint
+                Logger.log("Consuming asset files using service url: ", serviceUrl)
+                for (const cUrl of contentUrls) {
+                    let url: string = serviceUrl + `?url=${cUrl}`
+                    url = url + `&serviceAgreementId=${serviceAgreementId}`
+                    url = url + `&consumerAddress=${consumer.getId()}`
+                    Logger.log("Fetching asset from: ", url)
+                    const response: any = await webConnector.get(url)
+                    const blob: object = await response.blob()
+                    // Logger.log("response: ", response.headers, response)
+                    const parts: string[] = cUrl.split("/")
+                    const filename: string = parts[parts.length - 1]
+                    Logger.log("got blob: ", filename, blob)
+                    // :FIXME: this does not save the file, debug and fix
+                    saveAs(blob, "./downloads/" + filename)
+                    Logger.log("saved file to:", "./downloads/" + filename)
+                }
+                Logger.log("Done downloading asset files.")
             })
 
             return {

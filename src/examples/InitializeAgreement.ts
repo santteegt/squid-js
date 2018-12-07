@@ -23,12 +23,11 @@ import * as config from "./config.json"
             copyrightHolder: "Met Office",
             encoding: "UTF-8",
             compression: "zip",
-            contentType: "text/csv",
+            contentType: "Application/pdf",
             // tslint:disable-next-line
             workExample: "stationId,latitude,longitude,datetime,temperature,humidity423432fsd,51.509865,-0.118092,2011-01-01T10:55:11+00:00,7.2,68",
             contentUrls: [
-                "https://testocnfiles.blob.core.windows.net/testfiles/testzkp.zip",
-                "https://testocnfiles.blob.core.windows.net/testfiles/testzkp.zip",
+                "https://testocnfiles.blob.core.windows.net/testfiles/testzkp.pdf"
             ],
             links: [
                 {sample1: "http://data.ceda.ac.uk/badc/ukcp09/data/gridded-land-obs/gridded-land-obs-daily/"},
@@ -42,7 +41,7 @@ import * as config from "./config.json"
     } as MetaData)
 
     const ddo: DDO = await ocean.registerAsset(metaData, publisher)
-    Logger.log("did", ddo.id)
+    Logger.log("Registered asset with did:", ddo.id)
 
     const accessService = ddo.findServiceByType("Access")
 
