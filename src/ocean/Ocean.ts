@@ -179,14 +179,14 @@ export default class Ocean {
                     serviceAgreementId,
                 })
 
-            event.listenOnce((data) => {
+            event.listenOnce(async (data) => {
 
-                Logger.log("Paying asset")
-                new ServiceAgreement(data.returnValues.serviceAgreementId)
-                    .payAsset(id,
-                        metadataService.metadata.base.price,
-                        consumer,
-                    )
+                const sa: ServiceAgreement = new ServiceAgreement(data.returnValues.serviceAgreementId)
+                await sa.payAsset(id,
+                    metadataService.metadata.base.price,
+                    consumer,
+                )
+                Logger.log("Paid asset")
             })
 
             return {
@@ -213,7 +213,7 @@ export default class Ocean {
                 serviceAgreementSignature,
                 consumer.getId())
 
-        Logger.log(result)
+        Logger.log(result.status)
     }
 
     public async executeServiceAgreement(did: string,
