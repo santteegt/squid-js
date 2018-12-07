@@ -116,7 +116,7 @@ export default class Access extends TemplateBase {
             name: "refundPayment",
             contractName: "PaymentConditions",
             methodName: "refundPayment",
-            timeout: 1,
+            timeout: 3,
             parameters: [
                 {
                     name: "assetId",
