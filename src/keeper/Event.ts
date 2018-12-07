@@ -1,6 +1,7 @@
 import GenericContract from "./contracts/GenericContract"
 import EventListener from "./EventListener"
 import Web3Provider from "./Web3Provider"
+// import Logger from "../utils/Logger"
 
 export default class Event {
 
@@ -39,15 +40,19 @@ export default class Event {
     private async handler(callback: any) {
         const contract = await GenericContract.getInstance(this.contractName)
 
-        const events = await contract.getEventData(this.eventName, {
-            filter: this.filter,
-            fromBlock: this.lastBlock,
-            toBlock: "latest",
-        })
+        try {
+            const events = await contract.getEventData(this.eventName, {
+                filter: this.filter,
+                fromBlock: this.lastBlock,
+                toBlock: "latest",
+            })
 
-        if (events.length > 0) {
-            this.lastBlock = events[events.length - 1].blockNumber + 1
-            callback(events)
+            if (events.length > 0) {
+                this.lastBlock = events[events.length - 1].blockNumber + 1
+                callback(events)
+            }
+        } catch (err) {
+            // Logger.log("err")
         }
     }
 }
