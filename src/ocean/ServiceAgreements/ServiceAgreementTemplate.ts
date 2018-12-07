@@ -1,7 +1,5 @@
 import DDOCondition from "../../ddo/Condition"
 import Dependency from "../../ddo/Dependency"
-import Event from "../../ddo/Event"
-import EventHandler from "../../ddo/EventHandler"
 import MetaData from "../../ddo/MetaData"
 import Parameter from "../../ddo/Parameter"
 import ContractReflector from "../../keeper/ContractReflector"
@@ -105,17 +103,6 @@ export default class ServiceAgreementTemplate extends OceanBase {
     public async getConditions(metadata: MetaData, assetId: string): Promise<DDOCondition[]> {
         const conditions = await this.blendConditions()
         return conditions.map((condition: Condition, index: number): DDOCondition => {
-            const events: Event[] = [
-                {
-                    name: "PaymentReleased",
-                    actorType: "consumer",
-                    handler: {
-                        moduleName: "serviceAgreement",
-                        functionName: "fulfillAgreement",
-                        version: "0.1",
-                    } as EventHandler,
-                } as Event,
-            ]
 
             const mapParameterValueToName = (name) => {
 
@@ -159,7 +146,7 @@ export default class ServiceAgreementTemplate extends OceanBase {
                 functionName: condition.methodReflection.methodName,
                 index,
                 parameters,
-                events,
+                events: condition.events,
             } as DDOCondition
         })
     }
@@ -172,6 +159,7 @@ export default class ServiceAgreementTemplate extends OceanBase {
             return {
                 methodReflection,
                 timeout: method.timeout,
+                events: method.events,
                 parameters: method.parameters,
                 dependencies: method.dependencies,
                 dependencyTimeoutFlags: method.dependencyTimeoutFlags,
