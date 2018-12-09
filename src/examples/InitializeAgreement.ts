@@ -8,7 +8,7 @@ import * as config from "./config.json"
 (async () => {
     const ocean: Ocean = await Ocean.getInstance(config)
 
-    const publisher: Account = (await ocean.getAccounts())[0]
+    const publisher: Account = (await ocean.getAccounts())[1]
     const consumer: Account = (await ocean.getAccounts())[1]
 
     const metaData = new MetaData({
