@@ -1,7 +1,7 @@
 import {Logger, Ocean} from "../squid"
 // tslint:disable-next-line
 import EventListener from "../keeper/EventListener"
-import * as config from "./config.json"
+import config from "./config"
 
 (async () => {
     Ocean.getInstance(config)

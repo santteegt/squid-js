@@ -3,7 +3,7 @@ import MetaData from "../ddo/MetaData"
 import MetaDataBase from "../ddo/MetaDataBase"
 import Service from "../ddo/Service"
 import {Account, Logger, Ocean} from "../squid"
-import * as config from "./config.json"
+import config from "./config"
 
 (async () => {
     const ocean: Ocean = await Ocean.getInstance(config)
@@ -44,6 +44,8 @@ import * as config from "./config.json"
     Logger.log("Registered asset with did:", ddo.id)
 
     const accessService = ddo.findServiceByType("Access")
+
+    await consumer.requestTokens(100)
 
     const serviceAgreementSignatureResult: any = await ocean
         .signServiceAgreement(

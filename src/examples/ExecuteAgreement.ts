@@ -3,9 +3,10 @@ import MetaData from "../ddo/MetaData"
 import MetaDataBase from "../ddo/MetaDataBase"
 import Service from "../ddo/Service"
 import {Account, Logger, Ocean, ServiceAgreement} from "../squid"
-import * as config from "./config.json"
+import config from "./config"
 
 (async () => {
+
     const ocean: Ocean = await Ocean.getInstance(config)
 
     const publisher: Account = (await ocean.getAccounts())[0]

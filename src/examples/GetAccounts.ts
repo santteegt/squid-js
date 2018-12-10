@@ -1,7 +1,8 @@
 import {Logger, Ocean} from "../squid"
-import * as config from "./config.json"
+import config from "./config"
 
 (async () => {
+
     const ocean: Ocean = await Ocean.getInstance(config)
 
     const accounts = await ocean.getAccounts()

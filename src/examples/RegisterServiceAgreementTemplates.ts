@@ -1,14 +1,15 @@
 import {Account, Logger, Ocean, ServiceAgreementTemplate, Templates} from "../squid"
-import * as config from "./config.json"
+import config from "./config"
 
 (async () => {
+
     const ocean: Ocean = await Ocean.getInstance(config)
 
-    const templateOwner: Account = (await ocean.getAccounts())[5]
+    const templateOwner: Account = (await ocean.getAccounts())[0]
 
     const serviceAgreementTemplate: ServiceAgreementTemplate = new ServiceAgreementTemplate(new Templates.Access())
     const serviceAgreementRegistered: boolean = await serviceAgreementTemplate.register(templateOwner.getId())
 
-    Logger.log("ServiceAgreement registered:", serviceAgreementRegistered,
+    Logger.log("ServiceAgreementTemplate registered:", serviceAgreementRegistered,
         "templateId:", serviceAgreementTemplate.getId())
 })()
