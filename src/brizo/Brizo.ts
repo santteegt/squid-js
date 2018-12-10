@@ -1,6 +1,8 @@
 import Config from "../models/Config"
 import WebServiceConnectorProvider from "../utils/WebServiceConnectorProvider"
 
+const apiPath = "/api/v1/brizo/services"
+
 export default class Brizo {
     private url: string
 
@@ -10,16 +12,16 @@ export default class Brizo {
     }
 
     public getPurchaseEndpoint() {
-        return `${this.url}/api/v1/brizo/services/access/purchase?`
+        return `${this.url}${apiPath}/access/purchase?`
     }
 
-    public getConsumeEndpoint(pubKey: string, serviceId: string, url: string) {
-        return `${this.url}/api/v1/brizo/services/consume?pubKey=${pubKey}&serviceId=${serviceId}&url=${url}`
+    public getConsumeEndpoint() {
+        return `${this.url}${apiPath}/consume`
     }
 
     public getComputeEndpoint(pubKey: string, serviceId: string, algo: string, container: string) {
         // tslint:disable-next-line
-        return `${this.url}/api/v1/brizo/services/compute?pubKey=${pubKey}&serviceId=${serviceId}&algo=${algo}&container=${container}"`
+        return `${this.url}${apiPath}/compute?pubKey=${pubKey}&serviceId=${serviceId}&algo=${algo}&container=${container}"`
     }
 
     public async initializeServiceAgreement(
@@ -27,17 +29,22 @@ export default class Brizo {
         serviceAgreementId: string,
         serviceDefinitionId: string,
         signature: string,
-        consumerPublicKey: string): Promise<any> {
+        consumerAddress: string): Promise<any> {
 
-        return WebServiceConnectorProvider.getConnector().post(
-            `${this.url}/api/v1/brizo/services/access/initialize`,
-            {
-                did,
-                serviceAgreementId,
-                serviceDefinitionId,
-                signature,
-                consumerPublicKey,
-            })
+        const args = {
+            did,
+            serviceAgreementId,
+            serviceDefinitionId,
+            signature,
+            consumerAddress,
+        }
+
+        return WebServiceConnectorProvider
+            .getConnector()
+            .post(
+                `${this.url}${apiPath}/access/initialize`,
+                decodeURI(JSON.stringify(args)),
+            )
 
     }
 }

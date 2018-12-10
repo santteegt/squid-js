@@ -25,6 +25,8 @@ export default class ServiceAgreement extends ContractBase {
         ])
     }
 
+    // todo get service agreement consumer
+
     public async getTemplateStatus(templateId: string) {
 
         return this.call("getTemplateStatus", [templateId])
@@ -47,7 +49,7 @@ export default class ServiceAgreement extends ContractBase {
 
         return this.send("executeAgreement", publisherAddress, [
             serviceAgreementTemplateId, serviceAgreementSignatureHash, consumerAddress, valueHashes,
-            timeoutValues, "0x" + serviceAgreementId, "0x" + did.replace("did:op:", ""),
+            timeoutValues, serviceAgreementId, "0x" + did.replace("did:op:", ""),
         ])
     }
 }

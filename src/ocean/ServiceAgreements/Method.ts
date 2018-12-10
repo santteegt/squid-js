@@ -1,3 +1,4 @@
+import Event from "./Event"
 import Parameter from "./Parameter"
 
 export default class Method {
@@ -6,6 +7,7 @@ export default class Method {
     public methodName: string
     public timeout: number
     public parameters: Parameter[]
+    public events: Event[]
     public dependencies: string[]
     public dependencyTimeoutFlags: number[]
     public isTerminalCondition: boolean

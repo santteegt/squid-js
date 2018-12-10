@@ -9,7 +9,7 @@ const production = require('./webpack.production.js')
 const AddVendorsPlugin = require('./plugins/add-vendors-plugin')
 
 const paths = {
-    entry: path.resolve(__dirname, './src/squid.ts'),
+    entry: path.resolve(__dirname, './dist/node/squid.js'),
     bundle: path.resolve(__dirname, 'dist/browser'),
 }
 

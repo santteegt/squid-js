@@ -1,5 +1,6 @@
 import {assert} from "chai"
 import ConfigProvider from "../../src/ConfigProvider"
+import MetaData from "../../src/ddo/MetaData"
 import Account from "../../src/ocean/Account"
 import IdGenerator from "../../src/ocean/IdGenerator"
 import Ocean from "../../src/ocean/Ocean"
@@ -48,7 +49,7 @@ describe("ServiceAgreementTemplate", () => {
                 new ServiceAgreementTemplate(access)
             assert(serviceAgreementTemplate)
 
-            const conds = await serviceAgreementTemplate.getConditions()
+            const conds = await serviceAgreementTemplate.getConditions(new MetaData(), IdGenerator.generateId())
             assert(conds)
         })
     })

@@ -14,7 +14,9 @@ export default class Account extends OceanBase {
 
     public async getEtherBalance(): Promise<number> {
         // Logger.log("getting balance for", account);
-        return Web3Provider.getWeb3().eth
+        return Web3Provider
+            .getWeb3()
+            .eth
             .getBalance(this.id, "latest")
             .then((balance: string): number => {
                 // Logger.log("balance", balance);
@@ -35,7 +37,9 @@ export default class Account extends OceanBase {
     }
 
     public async requestTokens(amount: number): Promise<number> {
-        await (await Keeper.getInstance()).market.requestTokens(amount, this.id)
+        await (await Keeper.getInstance())
+            .market
+            .requestTokens(amount, this.id)
         return amount
     }
 

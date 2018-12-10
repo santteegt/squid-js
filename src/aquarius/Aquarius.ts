@@ -137,6 +137,6 @@ export default class Aquarius {
     }
 
     public getServiceEndpoint(did) {
-        return `${this.url}/api/v1/provider/assets/metadata/${did}`
+        return `${this.url}/api/v1/aquarius/assets/metadata/${did}`
     }
 }

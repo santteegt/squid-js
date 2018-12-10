@@ -3,18 +3,11 @@ import MetaData from "../ddo/MetaData"
 import MetaDataBase from "../ddo/MetaDataBase"
 import Service from "../ddo/Service"
 import {Account, Logger, Ocean, ServiceAgreement} from "../squid"
+import config from "./config"
 
 (async () => {
-    const ocean: Ocean = await Ocean.getInstance({
-        nodeUri: "http://localhost:8545",
-        aquariusUri: "http://localhost:5000",
-        brizoUri: "http://localhost:8030",
-        parityUri: "http://localhost:9545",
-        secretStoreUri: "http://localhost:12001",
-        threshold: 0,
-        password: "unittest",
-        address: "0xed243adfb84a6626eba46178ccb567481c6e655d",
-    })
+
+    const ocean: Ocean = await Ocean.getInstance(config)
 
     const publisher: Account = (await ocean.getAccounts())[0]
     const consumer: Account = (await ocean.getAccounts())[1]
@@ -53,6 +46,8 @@ import {Account, Logger, Ocean, ServiceAgreement} from "../squid"
     Logger.log("did", ddo.id)
 
     const accessService = ddo.findServiceByType("Access")
+
+    await consumer.requestTokens(metaData.base.price)
 
     const serviceAgreementSignatureResult: any = await ocean.signServiceAgreement(ddo.id,
         accessService.serviceDefinitionId, consumer)

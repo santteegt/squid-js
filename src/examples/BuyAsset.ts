@@ -1,10 +1,8 @@
-import AdditionalInformation from "../ddo/AdditionalInformation"
-import Curation from "../ddo/Curation"
 import DDO from "../ddo/DDO"
 import MetaData from "../ddo/MetaData"
 import MetaDataBase from "../ddo/MetaDataBase"
 import Service from "../ddo/Service"
-import {Account, Logger, Ocean} from "../squid"
+import {Account, Logger, Ocean, ServiceAgreement} from "../squid"
 import config from "./config"
 
 (async () => {
@@ -13,21 +11,7 @@ import config from "./config"
     const publisher: Account = (await ocean.getAccounts())[0]
     const consumer: Account = (await ocean.getAccounts())[1]
 
-    const metaData = {
-        additionalInformation: {
-            structuredMarkup: [
-                {
-                    mediaType: "application/ld+json",
-                    uri: "http://skos.um.es/unescothes/C01194/jsonld",
-                },
-                {
-                    mediaType: "text/turtle",
-                    uri: "http://skos.um.es/unescothes/C01194/turtle",
-                },
-            ],
-            updateFrecuency: "yearly",
-            checksum: "efdd14d39feb726e321931f408b3454d26f1a4899bcc608a68b5397f23203174",
-        } as AdditionalInformation,
+    const metaData = new MetaData({
         base: {
             name: "Office Humidity",
             type: "dataset",
@@ -55,26 +39,32 @@ import config from "./config"
             tags: "weather, uk, 2011, temperature, humidity",
             price: 10,
         } as MetaDataBase,
-        curation: {
-            rating: 0.94,
-            numVotes: 124,
-            schema: "Binary Votting",
-        } as Curation,
-    }
+    } as MetaData)
 
-    const ddo: DDO = await ocean.registerAsset(metaData as MetaData, publisher)
+    const ddo: DDO = await ocean.registerAsset(metaData, publisher)
     Logger.log("did", ddo.id)
+    const assetId = ddo.id.replace("did:op:", "")
 
-    const accessService: Service = ddo.findServiceByType("Access")
+    const accessService = ddo.findServiceByType("Access")
 
     await consumer.requestTokens(metaData.base.price)
 
-    const serviceAgreementResult: any = await ocean
-        .signServiceAgreement(
-            ddo.id,
-            accessService.serviceDefinitionId,
-            consumer)
+    const serviceAgreementSignatureResult: any = await ocean.signServiceAgreement(ddo.id,
+        accessService.serviceDefinitionId, consumer)
+    Logger.log("ServiceAgreement Id:", serviceAgreementSignatureResult.serviceAgreementId)
+    Logger.log("ServiceAgreement Signature:", serviceAgreementSignatureResult.serviceAgreementSignature)
 
-    Logger.log("ServiceAgreement Id:", serviceAgreementResult.serviceAgreementId)
-    Logger.log("ServiceAgreement Signature:", serviceAgreementResult.serviceAgreementSignature)
+    const service: Service = ddo.findServiceByType("Access")
+
+    const serviceAgreement: ServiceAgreement = await ocean.executeServiceAgreement(
+        ddo.id,
+        service.serviceDefinitionId,
+        serviceAgreementSignatureResult.serviceAgreementId,
+        serviceAgreementSignatureResult.serviceAgreementSignature,
+        consumer,
+        publisher)
+    Logger.log("ServiceAgreement Id:", serviceAgreement.getId())
+
+    const paid = await serviceAgreement.payAsset(assetId, metaData.base.price, consumer)
+    Logger.log(`Asset paid: ${paid}`)
 })()

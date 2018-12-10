@@ -64,7 +64,7 @@ const ocean: Ocean = await Ocean.getInstance({
     // the threshold of nodes from the secre store that have to agree to the decrypt
     threshold: 0,
     // the password for the account (in the local parity node) used to sign messages for secret store
-    password: "unittest",
+    password: "you password",
     // the address of the account (in the local parity node) used to sign messages for secret store
     address: "0xed243adfb84a6626eba46178ccb567481c6e655d",
 })

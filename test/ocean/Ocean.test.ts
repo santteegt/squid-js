@@ -127,20 +127,24 @@ describe("Ocean", () => {
             const publisher = accounts[0]
             const consumer = accounts[1]
 
-            const ddo: DDO = await ocean.registerAsset(new MetaData(), publisher)
+            const metaData = new MetaData()
+            const ddo: DDO = await ocean.registerAsset(metaData, publisher)
 
             const service: Service = ddo.findServiceByType("Access")
 
             // @ts-ignore
             WebServiceConnectorProvider.setConnector(new WebServiceConnectorMock(ddo))
 
-            const serviceAgreementSignature: any = await ocean.signServiceAgreement(ddo.id,
+            await consumer.requestTokens(metaData.base.price)
+
+            const signServiceAgreementResult: any = await ocean.signServiceAgreement(ddo.id,
                 service.serviceDefinitionId, consumer)
 
-            assert(serviceAgreementSignature)
-            assert(serviceAgreementSignature.serviceAgreementId)
-            assert(serviceAgreementSignature.serviceAgreementSignature)
-            assert(serviceAgreementSignature.serviceAgreementSignature.startsWith("0x"))
+            assert(signServiceAgreementResult)
+            assert(signServiceAgreementResult.serviceAgreementId, "no serviceAgreementId")
+            assert(signServiceAgreementResult.serviceAgreementSignature, "no serviceAgreementSignature")
+            assert(signServiceAgreementResult.serviceAgreementSignature.startsWith("0x"))
+            assert(signServiceAgreementResult.serviceAgreementSignature.length === 132)
         })
 
     })

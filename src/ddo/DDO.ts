@@ -22,7 +22,7 @@ export default class DDO {
 
     public constructor(ddo?: {
         id?: string,
-        publicKey?: any[],
+        publicKey?: PublicKey[],
         authentication?: Authentication[],
         service?: Service[],
     }) {

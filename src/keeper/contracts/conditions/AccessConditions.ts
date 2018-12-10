@@ -9,6 +9,8 @@ export default class AccessConditions extends ContractBase {
         return accessConditions
     }
 
+    // todo add check permissions proxy
+
     public async grantAccess(serviceAgreementId: any, assetId: any, documentKeyId: any, publisherAddress: string)
         : Promise<Receipt> {
         return this.send("grantAccess", publisherAddress, [

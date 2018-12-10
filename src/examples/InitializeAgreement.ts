@@ -3,20 +3,12 @@ import MetaData from "../ddo/MetaData"
 import MetaDataBase from "../ddo/MetaDataBase"
 import Service from "../ddo/Service"
 import {Account, Logger, Ocean} from "../squid"
+import config from "./config"
 
 (async () => {
-    const ocean: Ocean = await Ocean.getInstance({
-        nodeUri: "http://localhost:8545",
-        aquariusUri: "http://localhost:5000",
-        brizoUri: "http://localhost:8030",
-        parityUri: "http://localhost:9545",
-        secretStoreUri: "http://localhost:12001",
-        threshold: 0,
-        password: "unittest",
-        address: "0xed243adfb84a6626eba46178ccb567481c6e655d",
-    })
+    const ocean: Ocean = await Ocean.getInstance(config)
 
-    const publisher: Account = (await ocean.getAccounts())[0]
+    const publisher: Account = (await ocean.getAccounts())[1]
     const consumer: Account = (await ocean.getAccounts())[1]
 
     const metaData = new MetaData({
@@ -31,12 +23,11 @@ import {Account, Logger, Ocean} from "../squid"
             copyrightHolder: "Met Office",
             encoding: "UTF-8",
             compression: "zip",
-            contentType: "text/csv",
+            contentType: "Application/pdf",
             // tslint:disable-next-line
             workExample: "stationId,latitude,longitude,datetime,temperature,humidity423432fsd,51.509865,-0.118092,2011-01-01T10:55:11+00:00,7.2,68",
             contentUrls: [
-                "https://testocnfiles.blob.core.windows.net/testfiles/testzkp.zip",
-                "https://testocnfiles.blob.core.windows.net/testfiles/testzkp.zip",
+                "https://testocnfiles.blob.core.windows.net/testfiles/testzkp.pdf",
             ],
             links: [
                 {sample1: "http://data.ceda.ac.uk/badc/ukcp09/data/gridded-land-obs/gridded-land-obs-daily/"},
@@ -50,9 +41,11 @@ import {Account, Logger, Ocean} from "../squid"
     } as MetaData)
 
     const ddo: DDO = await ocean.registerAsset(metaData, publisher)
-    Logger.log("did", ddo.id)
+    Logger.log("Registered asset with did:", ddo.id)
 
     const accessService = ddo.findServiceByType("Access")
+
+    await consumer.requestTokens(100)
 
     const serviceAgreementSignatureResult: any = await ocean
         .signServiceAgreement(

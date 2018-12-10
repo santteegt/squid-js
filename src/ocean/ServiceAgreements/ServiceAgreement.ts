@@ -117,11 +117,6 @@ export default class ServiceAgreement extends OceanBase {
 
         return new ServiceAgreement(
             executeAgreementReceipt.events.ExecuteAgreement.returnValues.serviceAgreementId,
-            ddo,
-            publisher,
-            new Account(consumerAddress),
-            executeAgreementReceipt.events.ExecuteAgreement.returnValues.state,
-            executeAgreementReceipt.events.ExecuteAgreement.returnValues.status,
         )
     }
 
@@ -186,7 +181,7 @@ export default class ServiceAgreement extends OceanBase {
 
                 contionValues.push({
                     type: parameter.type,
-                    value: parameter.name === "serviceId" ? "0x" + serviceAgreementId : parameter.value,
+                    value: parameter.name === "serviceId" ? serviceAgreementId : parameter.value,
                 } as ValuePair)
             })
 
@@ -196,16 +191,11 @@ export default class ServiceAgreement extends OceanBase {
         return values
     }
 
-    private constructor(serviceAgreementId: string,
-                        ddo: DDO,
-                        private publisher: Account,
-                        consumer: Account,
-                        state: boolean,
-                        status: boolean) {
+    constructor(serviceAgreementId: string) {
         super(serviceAgreementId)
     }
 
-    public async buyAsset(assetId: string, price: number, consumer: Account): Promise<boolean> {
+    public async payAsset(assetId: string, price: number, consumer: Account): Promise<boolean> {
         const {paymentConditions, token} = await Keeper.getInstance()
 
         await token.approve(paymentConditions.getAddress(), price, consumer.getId())
@@ -217,12 +207,11 @@ export default class ServiceAgreement extends OceanBase {
         return lockPaymentReceipt.status
     }
 
-    public async grantAccess(assetId: string, documentId: string): Promise<boolean> {
+    public async grantAccess(assetId: string, documentId: string, publisher: Account): Promise<boolean> {
         const {accessConditions} = await Keeper.getInstance()
 
         const grantAccessReceipt =
-            await accessConditions.grantAccess(this.getId(), assetId, documentId,
-                this.publisher.getId())
+            await accessConditions.grantAccess(this.getId(), assetId, documentId, publisher.getId())
 
         return !!grantAccessReceipt.events.AccessGranted
     }

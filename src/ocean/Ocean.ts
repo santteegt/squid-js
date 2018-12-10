@@ -1,15 +1,18 @@
+import {saveAs} from "file-saver"
 import AquariusProvider from "../aquarius/AquariusProvider"
 import SearchQuery from "../aquarius/query/SearchQuery"
 import BrizoProvider from "../brizo/BrizoProvider"
 import ConfigProvider from "../ConfigProvider"
 import Authentication from "../ddo/Authentication"
-import DDOCondition from "../ddo/Condition"
+import Condition from "../ddo/Condition"
+import Contract from "../ddo/Contract"
 import DDO from "../ddo/DDO"
 import Event from "../ddo/Event"
-import EventHandlers from "../ddo/EventHandlers"
+import EventHandler from "../ddo/EventHandler"
 import MetaData from "../ddo/MetaData"
-import Parameter from "../ddo/Parameter"
+import PublicKey from "../ddo/PublicKey"
 import Service from "../ddo/Service"
+import ContractEvent from "../keeper/Event"
 import Keeper from "../keeper/Keeper"
 import Web3Provider from "../keeper/Web3Provider"
 import Config from "../models/Config"
@@ -18,10 +21,12 @@ import SecretStoreProvider from "../secretstore/SecretStoreProvider"
 import Logger from "../utils/Logger"
 import Account from "./Account"
 import IdGenerator from "./IdGenerator"
-import Condition from "./ServiceAgreements/Condition"
 import ServiceAgreement from "./ServiceAgreements/ServiceAgreement"
 import ServiceAgreementTemplate from "./ServiceAgreements/ServiceAgreementTemplate"
 import Access from "./ServiceAgreements/Templates/Access"
+
+import EventListener from "../keeper/EventListener"
+import WebServiceConnectorProvider from "../utils/WebServiceConnectorProvider"
 
 export default class Ocean {
 
@@ -62,74 +67,19 @@ export default class Ocean {
         const aquarius = AquariusProvider.getAquarius()
         const brizo = BrizoProvider.getBrizo()
 
-        const id: string = IdGenerator.generateId()
-        const did: string = `did:op:${id}`
-        const serviceDefinitionId: string = IdGenerator.generatePrefixedId()
+        const assetId: string = IdGenerator.generateId()
+        const did: string = `did:op:${assetId}`
+        const accessServiceDefinitionId: string = "0"
+        const computeServiceDefintionId: string = "1"
+        const metadataServiceDefinitionId: string = "2"
 
         metadata.base.contentUrls =
-            await SecretStoreProvider.getSecretStore().encryptDocument(id, metadata.base.contentUrls)
+            [await SecretStoreProvider.getSecretStore().encryptDocument(assetId, metadata.base.contentUrls)]
 
         const template = new Access()
         const serviceAgreementTemplate = new ServiceAgreementTemplate(template)
 
-        // get condition keys from template
-        const conditions: Condition[] = await serviceAgreementTemplate.getConditions()
-
-        // create ddo conditions out of the keys
-        const ddoConditions: DDOCondition[] = conditions
-            .map((condition: Condition, index: number): DDOCondition => {
-                const events: Event[] = [
-                    {
-                        name: "PaymentReleased",
-                        actorType: [
-                            "consumer",
-                        ],
-                        handlers: {
-                            moduleName: "serviceAgreement",
-                            functionName: "fulfillAgreement",
-                            version: "0.1",
-                        } as EventHandlers,
-                    } as Event,
-                ]
-
-                const mapParameterValueToName = (name) => {
-
-                    switch (name) {
-                        case "price":
-                            return metadata.base.price
-                        case "assetId":
-                            return "0x" + id
-                        case "documentKeyId":
-                            return "0x1234"
-                    }
-
-                    return null
-                }
-
-                const parameters: Parameter[] = condition.parameters.map((parameter: Parameter) => {
-                    return {
-                        name: parameter.name,
-                        type: parameter.type,
-                        value: mapParameterValueToName(parameter.name),
-                    } as Parameter
-                })
-
-                // Logger.log(`${condition.methodReflection.contractName}.${condition.methodReflection.methodName}`,
-                //    JSON.stringify(parameters, null, 2))
-
-                return {
-                    contractName: condition.methodReflection.contractName,
-                    methodName: condition.methodReflection.methodName,
-                    timeout: condition.timeout,
-                    index,
-                    conditionKey: condition.condtionKey,
-                    parameters,
-                    events,
-                    dependencies: condition.dependencies,
-                    dependencyTimeoutFlags: condition.dependencyTimeoutFlags,
-                    isTerminalCondition: condition.isTerminalCondition,
-                } as DDOCondition
-            })
+        const conditions: Condition[] = await serviceAgreementTemplate.getConditions(metadata, assetId)
 
         const serviceEndpoint = aquarius.getServiceEndpoint(did)
 
@@ -143,37 +93,47 @@ export default class Ocean {
             publicKey: [
                 {
                     id: did + "#keys-1",
-                },
-                {
                     type: "Ed25519VerificationKey2018",
-                },
-                {
                     owner: did,
-                },
-                {
                     publicKeyBase58: await publisher.getPublicKey(),
-                },
+                } as PublicKey,
             ],
             service: [
                 {
                     type: template.templateName,
                     purchaseEndpoint: brizo.getPurchaseEndpoint(),
-                    serviceEndpoint: brizo.getConsumeEndpoint(publisher.getId(),
-                        serviceDefinitionId, metadata.base.contentUrls[0]),
+                    serviceEndpoint: brizo.getConsumeEndpoint(),
                     // the id of the service agreement?
-                    serviceDefinitionId,
+                    serviceDefinitionId: accessServiceDefinitionId,
                     // the id of the service agreement template
                     templateId: serviceAgreementTemplate.getId(),
-                    conditions: ddoConditions,
+                    serviceAgreementContract: {
+                        contractName: "ServiceAgreement",
+                        fulfillmentOperator: template.fulfillmentOperator,
+                        events: [
+                            {
+                                name: "ExecuteAgreement",
+                                actorType: "consumer",
+                                handler: {
+                                    moduleName: "payment",
+                                    functionName: "lockPayment",
+                                    version: "0.1",
+                                } as EventHandler,
+                            } as Event,
+                        ],
+                    } as Contract,
+                    conditions,
                 } as Service,
                 {
                     type: "Compute",
                     serviceEndpoint: brizo.getComputeEndpoint(publisher.getId(),
-                        serviceDefinitionId, "xxx", "xxx"),
+                        computeServiceDefintionId, "xxx", "xxx"),
+                    serviceDefinitionId: computeServiceDefintionId,
                 } as Service,
                 {
                     type: "Metadata",
                     serviceEndpoint,
+                    serviceDefinitionId: metadataServiceDefinitionId,
                     metadata,
                 } as Service,
             ],
@@ -181,9 +141,11 @@ export default class Ocean {
 
         const storedDdo = await aquarius.storeDDO(ddo)
 
+        // Logger.log(JSON.stringify(storedDdo, null, 2))
+
         await didRegistry.registerAttribute(
-            id,
-            ValueType.DID,
+            assetId,
+            ValueType.URL,
             "Metadata",
             serviceEndpoint,
             publisher.getId())
@@ -197,11 +159,63 @@ export default class Ocean {
 
         const ddo = await AquariusProvider.getAquarius().retrieveDDO(did)
         const id = did.replace("did:op:", "")
-        const serviceAgreementId: string = IdGenerator.generateId()
+        const serviceAgreementId: string = IdGenerator.generatePrefixedId()
 
         try {
             const serviceAgreementSignature: string = await ServiceAgreement.signServiceAgreement(id,
                 ddo, serviceDefinitionId, serviceAgreementId, consumer)
+
+            const accessService: Service = ddo.findServiceByType("Access")
+            const metadataService: Service = ddo.findServiceByType("Metadata")
+
+            const price = metadataService.metadata.base.price
+            const balance = await consumer.getOceanBalance()
+            if (balance < price) {
+                throw new Error(`Not enough ocean tokens! Should have ${price} but has ${balance}`)
+            }
+
+            const event: ContractEvent = EventListener.subscribe(
+                accessService.serviceAgreementContract.contractName,
+                accessService.serviceAgreementContract.events[0].name, {
+                    serviceAgreementId,
+                })
+
+            event.listenOnce(async (data) => {
+
+                const sa: ServiceAgreement = new ServiceAgreement(data.returnValues.serviceAgreementId)
+                await sa.payAsset(id,
+                    metadataService.metadata.base.price,
+                    consumer,
+                )
+                Logger.log("Completed asset payment, now access should be granted.")
+            })
+            const accessEvent: ContractEvent = EventListener.subscribe(
+                accessService.conditions[1].contractName,
+                accessService.conditions[1].events[1].name, {})
+            accessEvent.listenOnce(async (data) => {
+                Logger.log("Awesome; got a AccessGranted Event. Let's download the asset files.")
+                const webConnector = WebServiceConnectorProvider.getConnector()
+                const contentUrls = await SecretStoreProvider.getSecretStore()
+                    .decryptDocument(id, metadataService.metadata.base.contentUrls[0])
+                const serviceUrl: string = accessService.serviceEndpoint
+                Logger.log("Consuming asset files using service url: ", serviceUrl)
+                for (const cUrl of contentUrls) {
+                    let url: string = serviceUrl + `?url=${cUrl}`
+                    url = url + `&serviceAgreementId=${serviceAgreementId}`
+                    url = url + `&consumerAddress=${consumer.getId()}`
+                    Logger.log("Fetching asset from: ", url)
+                    const response: any = await webConnector.get(url)
+                    const buffer: Buffer = await response.buffer()
+                    const parts: string[] = cUrl.split("/")
+                    const filename: string = parts[parts.length - 1]
+                    Logger.debug(`Got response: filename is ${filename}, url is ${response.url}`)
+                    const target = `${__dirname}/downloads/${filename}`
+                    await saveAs([buffer.toString("utf8")], filename)
+                    Logger.log("saved file to:", target)
+                }
+                Logger.log("Done downloading asset files.")
+            })
+
             return {
                 serviceAgreementId,
                 serviceAgreementSignature,
@@ -224,9 +238,9 @@ export default class Ocean {
                 serviceAgreementId,
                 serviceDefinitionId,
                 serviceAgreementSignature,
-                await consumer.getPublicKey())
+                consumer.getId())
 
-        Logger.log(result)
+        Logger.log(result.status)
     }
 
     public async executeServiceAgreement(did: string,
