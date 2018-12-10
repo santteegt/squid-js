@@ -1,3 +1,4 @@
+import {saveAs} from "file-saver"
 import AquariusProvider from "../aquarius/AquariusProvider"
 import SearchQuery from "../aquarius/query/SearchQuery"
 import BrizoProvider from "../brizo/BrizoProvider"
@@ -23,8 +24,6 @@ import IdGenerator from "./IdGenerator"
 import ServiceAgreement from "./ServiceAgreements/ServiceAgreement"
 import ServiceAgreementTemplate from "./ServiceAgreements/ServiceAgreementTemplate"
 import Access from "./ServiceAgreements/Templates/Access"
-
-import * as fs from "fs"
 
 import EventListener from "../keeper/EventListener"
 import WebServiceConnectorProvider from "../utils/WebServiceConnectorProvider"
@@ -210,20 +209,9 @@ export default class Ocean {
                     const parts: string[] = cUrl.split("/")
                     const filename: string = parts[parts.length - 1]
                     Logger.debug(`Got response: filename is ${filename}, url is ${response.url}`)
-                    fs.open("./downloads/" + filename, "w", (err, fd) => {
-                        if (err) {
-                            throw Error("error opening file for writing." + err)
-                        }
-                        fs.write(fd, buffer, 0, buffer.length, null, (writeErr) => {
-                            if (err) {
-                                throw Error("error writing file: " + writeErr)
-                            }
-                            fs.close(fd, () => {
-                                Logger.debug("file written.")
-                            })
-                        })
-                    })
-                    Logger.log("saved file to:", "./downloads/" + filename)
+                    const target = `${__dirname}/downloads/${filename}`
+                    await saveAs([buffer.toString("utf8")], filename)
+                    Logger.log("saved file to:", target)
                 }
                 Logger.log("Done downloading asset files.")
             })
