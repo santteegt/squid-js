@@ -15,22 +15,6 @@ export default abstract class ContractBase {
         this.contractName = contractName
     }
 
-    /*
-    public async listenToEventOnce(eventName: string, options: any): Promise<any> {
-        return new Promise<any>((resolve, reject) => {
-            if (!this.contract.events[eventName]) {
-                throw new Error(`Event ${eventName} not found on contract ${this.contractName}`)
-            }
-            this.contract.events[eventName](options, (err) => {
-                reject(err)
-            })
-                .on("data", (eventData: any) => {
-                    resolve(eventData)
-                })
-        })
-    }
-    */
-
     public async getEventData(eventName: any, options: any): Promise<Event[]> {
         if (!this.contract.events[eventName]) {
             throw new Error(`Event "${eventName}" not found on contract "${this.contractName}"`)
