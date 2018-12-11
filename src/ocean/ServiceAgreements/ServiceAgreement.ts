@@ -1,3 +1,4 @@
+import ConfigProvider from "../../ConfigProvider"
 import Condition from "../../ddo/Condition"
 import DDO from "../../ddo/DDO"
 import Service from "../../ddo/Service"
@@ -16,7 +17,9 @@ export default class ServiceAgreement extends OceanBase {
                                              serviceAgreementId: string,
                                              consumer: Account): Promise<string> {
 
-        // Logger.log("signing SA", serviceAgreementId)
+        if (ConfigProvider.getConfig().verbose) {
+            Logger.log("Signing SA with serviceAgreementId", serviceAgreementId)
+        }
 
         const service: Service = ddo.findServiceById(serviceDefinitionId)
         const values: ValuePair[][] = ServiceAgreement.getValuesFromService(service, serviceAgreementId)
@@ -25,6 +28,10 @@ export default class ServiceAgreement extends OceanBase {
 
         const serviceAgreementHashSignature = await ServiceAgreement.createSAHashSignature(service, serviceAgreementId,
             valueHashes, timeoutValues, consumer)
+
+        if (ConfigProvider.getConfig().verbose) {
+            Logger.log("SA hash signature:", serviceAgreementHashSignature)
+        }
 
         return serviceAgreementHashSignature
     }
@@ -37,7 +44,9 @@ export default class ServiceAgreement extends OceanBase {
                                                 consumer: Account,
                                                 publisher: Account): Promise<ServiceAgreement> {
 
-        // Logger.log("executing SA", serviceAgreementId)
+        if (ConfigProvider.getConfig().verbose) {
+            Logger.log("Executing SA with serviceAgreementId", serviceAgreementId)
+        }
 
         const service: Service = ddo.findServiceById(serviceDefinitionId)
         const values: ValuePair[][] = ServiceAgreement.getValuesFromService(service, serviceAgreementId)
