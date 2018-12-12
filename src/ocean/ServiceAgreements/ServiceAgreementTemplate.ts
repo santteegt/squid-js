@@ -1,3 +1,4 @@
+import ConfigProvider from "../../ConfigProvider"
 import DDOCondition from "../../ddo/Condition"
 import Dependency from "../../ddo/Dependency"
 import MetaData from "../../ddo/MetaData"
@@ -168,6 +169,10 @@ export default class ServiceAgreementTemplate extends OceanBase {
                     .generateConditionsKey(this.getId(), methodReflection),
             } as Condition
         })
+
+        if (ConfigProvider.getConfig().verbose) {
+            Logger.log("Conditions", JSON.stringify(conditions, null, 2))
+        }
 
         return conditions
     }

@@ -24,4 +24,7 @@ export default class Config {
     public address: string
     // the number of nodes in the secret store that have to agree on changes
     public threshold: number
+
+    /* Squid config */
+    public verbose: boolean = false
 }
