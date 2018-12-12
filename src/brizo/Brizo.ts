@@ -12,7 +12,7 @@ export default class Brizo {
     }
 
     public getPurchaseEndpoint() {
-        return `${this.url}${apiPath}/access/purchase?`
+        return `${this.url}${apiPath}/access/initialize`
     }
 
     public getConsumeEndpoint() {
@@ -21,7 +21,7 @@ export default class Brizo {
 
     public getComputeEndpoint(pubKey: string, serviceId: string, algo: string, container: string) {
         // tslint:disable-next-line
-        return `${this.url}${apiPath}/compute?pubKey=${pubKey}&serviceId=${serviceId}&algo=${algo}&container=${container}"`
+        return `${this.url}${apiPath}/compute`
     }
 
     public async initializeServiceAgreement(
@@ -42,7 +42,7 @@ export default class Brizo {
         return WebServiceConnectorProvider
             .getConnector()
             .post(
-                `${this.url}${apiPath}/access/initialize`,
+                this.getPurchaseEndpoint(),
                 decodeURI(JSON.stringify(args)),
             )
 
