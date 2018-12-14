@@ -12,7 +12,7 @@ export default class OceanMarket extends ContractBase {
 
     // call functions (costs no gas)
     public async isAssetActive(assetId: string): Promise<boolean> {
-        return this.call("checkAsset", ["0x" + assetId])
+        return this.call("checkAsset", [assetId])
     }
 
     public async verifyOrderPayment(orderId: string): Promise<boolean> {
@@ -20,7 +20,7 @@ export default class OceanMarket extends ContractBase {
     }
 
     public async getAssetPrice(assetId: string): Promise<number> {
-        return this.call("getAssetPrice", ["0x" + assetId])
+        return this.call("getAssetPrice", [assetId])
             .then((price: string) => new BigNumber(price).toNumber())
     }
 
@@ -33,6 +33,6 @@ export default class OceanMarket extends ContractBase {
     }
 
     public async register(assetId: string, price: number, publisherAddress: string): Promise<Receipt> {
-        return this.send("register", publisherAddress, ["0x" + assetId, price])
+        return this.send("register", publisherAddress, [assetId, price])
     }
 }

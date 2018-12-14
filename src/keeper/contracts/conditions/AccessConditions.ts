@@ -14,7 +14,7 @@ export default class AccessConditions extends ContractBase {
     public async grantAccess(serviceAgreementId: any, assetId: any, documentKeyId: any, publisherAddress: string)
         : Promise<Receipt> {
         return this.send("grantAccess", publisherAddress, [
-            serviceAgreementId, "0x" + assetId, "0x" + documentKeyId,
+            serviceAgreementId, assetId, documentKeyId,
         ])
     }
 }
