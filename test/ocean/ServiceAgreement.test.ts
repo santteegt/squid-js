@@ -44,7 +44,7 @@ describe("ServiceAgreement", () => {
 
         accessService = {
             type: "Access",
-            serviceDefinitionId: IdGenerator.generateId(),
+            serviceDefinitionId: "0",
             templateId: serviceAgreementTemplate.getId(),
             conditions,
         } as Service
