@@ -67,7 +67,7 @@ export default class Ocean {
         const aquarius = AquariusProvider.getAquarius()
         const brizo = BrizoProvider.getBrizo()
 
-        const assetId: string = IdGenerator.generateId()
+        const assetId: string = IdGenerator.generatePrefixedId()
         const did: string = `did:op:${assetId}`
         const accessServiceDefinitionId: string = "0"
         const computeServiceDefintionId: string = "1"
@@ -183,7 +183,8 @@ export default class Ocean {
             event.listenOnce(async (data) => {
 
                 const sa: ServiceAgreement = new ServiceAgreement(data.returnValues.serviceAgreementId)
-                await sa.payAsset(id,
+                await sa.payAsset(
+                    id,
                     metadataService.metadata.base.price,
                     consumer,
                 )
