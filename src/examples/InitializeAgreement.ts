@@ -63,6 +63,8 @@ import config from "./config"
             service.serviceDefinitionId,
             serviceAgreementSignatureResult.serviceAgreementId,
             serviceAgreementSignatureResult.serviceAgreementSignature,
-            consumer)
+            (files) => Logger.log(`Got files, first files length in bytes: ${files[0].length}`),
+            consumer,
+        )
 
 })()
