@@ -26,7 +26,7 @@ describe("DIDRegistry", () => {
 
         it("should register an attribute in a new did", async () => {
             const ownerAccount: Account = (await ocean.getAccounts())[0]
-            const did = IdGenerator.generateId()
+            const did = IdGenerator.generatePrefixedId()
             const providerKey = Web3Provider.getWeb3().utils.fromAscii("provider")
             const data = "my nice provider, is nice"
             const receipt = await didRegistry.registerAttribute(did, ValueType.DID, providerKey,
@@ -37,7 +37,7 @@ describe("DIDRegistry", () => {
 
         it("should register another attribute in the same did", async () => {
             const ownerAccount: Account = (await ocean.getAccounts())[0]
-            const did = IdGenerator.generateId()
+            const did = IdGenerator.generatePrefixedId()
             {
                 // register the first attribute
                 const providerKey = Web3Provider.getWeb3().utils.fromAscii("provider")
@@ -62,7 +62,7 @@ describe("DIDRegistry", () => {
 
         it("should get the owner of a did properly", async () => {
             const ownerAccount: Account = (await ocean.getAccounts())[0]
-            const did = IdGenerator.generateId()
+            const did = IdGenerator.generatePrefixedId()
             const providerKey = Web3Provider.getWeb3().utils.fromAscii("provider")
             const data = "my nice provider, is nice"
             await didRegistry.registerAttribute(did, ValueType.DID, providerKey,
@@ -74,7 +74,7 @@ describe("DIDRegistry", () => {
         })
 
         it("should get 0x00.. for a not registered did", async () => {
-            const owner = await didRegistry.getOwner("1234")
+            const owner = await didRegistry.getOwner("0x1234")
             assert(owner === "0x0000000000000000000000000000000000000000")
         })
 
@@ -84,7 +84,7 @@ describe("DIDRegistry", () => {
 
         it("should the block number of the last update of the did attribute", async () => {
             const ownerAccount: Account = (await ocean.getAccounts())[0]
-            const did = IdGenerator.generateId()
+            const did = IdGenerator.generatePrefixedId()
             const providerKey = Web3Provider.getWeb3().utils.fromAscii("provider")
             const data = "my nice provider, is nice"
             await didRegistry.registerAttribute(did, ValueType.DID, providerKey,

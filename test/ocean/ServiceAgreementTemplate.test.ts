@@ -49,7 +49,7 @@ describe("ServiceAgreementTemplate", () => {
                 new ServiceAgreementTemplate(access)
             assert(serviceAgreementTemplate)
 
-            const conds = await serviceAgreementTemplate.getConditions(new MetaData(), IdGenerator.generateId())
+            const conds = await serviceAgreementTemplate.getConditions(new MetaData(), IdGenerator.generatePrefixedId())
             assert(conds)
         })
     })

@@ -23,7 +23,7 @@ let consumerAccount: Account
 let accessService: Service
 let metaDataService: Service
 
-const assetId: string = IdGenerator.generateId()
+const assetId: string = IdGenerator.generatePrefixedId()
 
 describe("ServiceAgreement", () => {
 
@@ -44,7 +44,7 @@ describe("ServiceAgreement", () => {
 
         accessService = {
             type: "Access",
-            serviceDefinitionId: IdGenerator.generateId(),
+            serviceDefinitionId: "0",
             templateId: serviceAgreementTemplate.getId(),
             conditions,
         } as Service

@@ -85,7 +85,7 @@ describe("Aquarius", () => {
 
         it("should store a ddo", async () => {
 
-            const did: string = `did:op:${IdGenerator.generateId()}`
+            const did: string = `did:op:${IdGenerator.generatePrefixedId()}`
             const ddo: DDO = new DDO({
                 id: did,
             })
@@ -103,7 +103,7 @@ describe("Aquarius", () => {
 
         it("should store a ddo", async () => {
 
-            const did: string = `did:op:${IdGenerator.generateId()}`
+            const did: string = `did:op:${IdGenerator.generatePrefixedId()}`
             const ddo: DDO = new DDO({
                 id: did,
             })

@@ -111,9 +111,9 @@ export default class ServiceAgreementTemplate extends OceanBase {
                     case "price":
                         return metadata.base.price
                     case "assetId":
-                        return "0x" + assetId
+                        return assetId
                     case "documentKeyId":
-                        return "0x" + assetId
+                        return assetId
                 }
 
                 return null
