@@ -2,13 +2,13 @@ import {assert} from "chai"
 import ConfigProvider from "../../src/ConfigProvider"
 import MetaData from "../../src/ddo/MetaData"
 import Account from "../../src/ocean/Account"
-import IdGenerator from "../../src/ocean/IdGenerator"
 import Ocean from "../../src/ocean/Ocean"
 import ServiceAgreementTemplate from "../../src/ocean/ServiceAgreements/ServiceAgreementTemplate"
 import Access from "../../src/ocean/ServiceAgreements/Templates/Access"
 import TemplateBase from "../../src/ocean/ServiceAgreements/Templates/TemplateBase"
 import config from "../config"
 import TestContractHandler from "../keeper/TestContractHandler"
+import TestIdGenerator from "../TestIdGenerator"
 
 let ocean: Ocean
 let accounts: Account[]
@@ -27,7 +27,7 @@ describe("ServiceAgreementTemplate", () => {
 
             const templateOwner = accounts[0]
             const access: TemplateBase = new Access()
-            access.id = IdGenerator.generatePrefixedId()
+            access.id = TestIdGenerator.generatePrefixedId()
             const serviceAgreementTemplate: ServiceAgreementTemplate =
                 new ServiceAgreementTemplate(access)
             assert(serviceAgreementTemplate)
@@ -44,12 +44,13 @@ describe("ServiceAgreementTemplate", () => {
         it("should setup an Access agreement template correctly", async () => {
 
             const access: TemplateBase = new Access()
-            access.id = IdGenerator.generatePrefixedId()
+            access.id = TestIdGenerator.generatePrefixedId()
             const serviceAgreementTemplate: ServiceAgreementTemplate =
                 new ServiceAgreementTemplate(access)
             assert(serviceAgreementTemplate)
 
-            const conds = await serviceAgreementTemplate.getConditions(new MetaData(), IdGenerator.generatePrefixedId())
+            const conds = await serviceAgreementTemplate.getConditions(new MetaData(),
+                TestIdGenerator.generatePrefixedId())
             assert(conds)
         })
     })
@@ -59,7 +60,7 @@ describe("ServiceAgreementTemplate", () => {
 
             const publisherAccount = accounts[0]
             const access: TemplateBase = new Access()
-            access.id = IdGenerator.generatePrefixedId()
+            access.id = TestIdGenerator.generatePrefixedId()
             const serviceAgreementTemplate: ServiceAgreementTemplate =
                 new ServiceAgreementTemplate(access)
             assert(serviceAgreementTemplate)

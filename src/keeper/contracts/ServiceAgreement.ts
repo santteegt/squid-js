@@ -49,7 +49,7 @@ export default class ServiceAgreement extends ContractBase {
 
         return this.send("executeAgreement", publisherAddress, [
             serviceAgreementTemplateId, serviceAgreementSignatureHash, consumerAddress, valueHashes,
-            timeoutValues, serviceAgreementId, "0x" + did.replace("did:op:", ""),
+            timeoutValues, "0x" + serviceAgreementId, "0x" + did.replace("did:op:", ""),
         ])
     }
 }

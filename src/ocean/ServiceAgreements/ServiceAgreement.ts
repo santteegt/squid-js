@@ -172,7 +172,7 @@ export default class ServiceAgreement extends OceanBase {
             {type: "bytes32[]", value: conditionKeys} as ValuePair,
             {type: "bytes32[]", value: valueHashes} as ValuePair,
             {type: "uint256[]", value: timeouts} as ValuePair,
-            {type: "bytes32", value: serviceAgreementId} as ValuePair,
+            {type: "bytes32", value: "0x" + serviceAgreementId} as ValuePair,
         ]
 
         return Web3Provider.getWeb3().utils.soliditySha3(...args).toString("hex")

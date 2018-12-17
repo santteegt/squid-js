@@ -5,8 +5,4 @@ export default class IdGenerator {
         const id = `${v4()}${v4()}`
         return id.replace(/-/g, "")
     }
-
-    public static generatePrefixedId() {
-        return "0x" + this.generateId()
-    }
 }

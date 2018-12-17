@@ -158,7 +158,7 @@ export default class Ocean {
 
         const ddo = await AquariusProvider.getAquarius().retrieveDDO(did)
         const id = did.replace("did:op:", "")
-        const serviceAgreementId: string = IdGenerator.generatePrefixedId()
+        const serviceAgreementId: string = IdGenerator.generateId()
 
         try {
             const serviceAgreementSignature: string = await ServiceAgreement.signServiceAgreement(id,
