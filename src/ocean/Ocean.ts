@@ -233,15 +233,8 @@ export default class Ocean {
                 let url: string = serviceUrl + `?url=${cUrl}`
                 url = url + `&serviceAgreementId=${serviceAgreementId}`
                 url = url + `&consumerAddress=${consumer.getId()}`
-                Logger.log("Fetching asset from: ", url)
-                const response: any = await webConnector.get(url)
-                const responseBuffer: Buffer = await response.buffer()
-                const urlParts: string[] = cUrl.split("/")
-                const filename: string = urlParts[urlParts.length - 1]
-                Logger.debug(`Got response: filename is ${filename}, url is ${response.url}`)
-                files.push(responseBuffer.toString("utf8"))
+                files.push(url)
             }
-            Logger.log("Done downloading asset files.")
 
             cb(files)
         })
