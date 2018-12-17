@@ -66,7 +66,7 @@ export default class Ocean {
         const aquarius = AquariusProvider.getAquarius()
         const brizo = BrizoProvider.getBrizo()
 
-        const assetId: string = IdGenerator.generatePrefixedId()
+        const assetId: string = IdGenerator.generateId()
         const did: string = `did:op:${assetId}`
         const accessServiceDefinitionId: string = "0"
         const computeServiceDefintionId: string = "1"

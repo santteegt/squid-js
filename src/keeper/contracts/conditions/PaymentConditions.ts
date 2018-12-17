@@ -12,7 +12,7 @@ export default class PaymentConditions extends ContractBase {
     public async lockPayment(serviceAgreementId: string, assetId: string, price: number, consumerAddress: string)
         : Promise<Receipt> {
         return this.send("lockPayment", consumerAddress, [
-            serviceAgreementId, assetId, price,
+            serviceAgreementId, "0x" + assetId, price,
         ])
     }
 }
