@@ -1,4 +1,3 @@
-// import Logger from "../utils/Logger"
 import OceanAuth from "./contracts/Auth"
 import AccessConditions from "./contracts/conditions/AccessConditions"
 import PaymentConditions from "./contracts/conditions/PaymentConditions"
@@ -6,6 +5,7 @@ import DIDRegistry from "./contracts/DIDRegistry"
 import OceanMarket from "./contracts/Market"
 import ServiceAgreement from "./contracts/ServiceAgreement"
 import OceanToken from "./contracts/Token"
+
 import Web3Provider from "./Web3Provider"
 
 export default class Keeper {
