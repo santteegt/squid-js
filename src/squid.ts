@@ -6,6 +6,8 @@ import ServiceAgreementTemplate from "./ocean/ServiceAgreements/ServiceAgreement
 import Access from "./ocean/ServiceAgreements/Templates/Access"
 import FitchainCompute from "./ocean/ServiceAgreements/Templates/FitchainCompute"
 import Logger from "./utils/Logger"
+import WebServiceConnectorProvider from "./utils/WebServiceConnectorProvider"
+import SecretStoreProvider from "./secretstore/SecretStoreProvider"
 
 const Templates = {Access, FitchainCompute}
 
@@ -17,4 +19,6 @@ export {
     Templates,
     Account,
     EventListener,
+    WebServiceConnectorProvider,
+    SecretStoreProvider,
 }
