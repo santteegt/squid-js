@@ -18,7 +18,6 @@ import Config from "../models/Config"
 import ValueType from "../models/ValueType"
 import SecretStoreProvider from "../secretstore/SecretStoreProvider"
 import Logger from "../utils/Logger"
-import WebServiceConnectorProvider from "../utils/WebServiceConnectorProvider"
 import Account from "./Account"
 import DID from "./DID"
 import IdGenerator from "./IdGenerator"
@@ -221,7 +220,6 @@ export default class Ocean {
 
         accessEvent.listenOnce(async () => {
             Logger.log("Awesome; got a AccessGranted Event. Let's download the asset files.")
-            const webConnector = WebServiceConnectorProvider.getConnector()
             const contentUrls = await SecretStoreProvider
                 .getSecretStore()
                 .decryptDocument(d.getId(), metadataService.metadata.base.contentUrls[0])
