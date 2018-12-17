@@ -15,21 +15,21 @@ export default class DIDRegistry extends ContractBase {
                                    value: string, ownerAddress: string): Promise<Receipt> {
 
         return this.send("registerAttribute",
-            ownerAddress, [did, type, Web3Provider.getWeb3().utils.fromAscii(key), value],
+            ownerAddress, ["0x" + did, type, Web3Provider.getWeb3().utils.fromAscii(key), value],
         )
     }
 
     public async getOwner(did: string): Promise<string> {
 
         return this.call("getOwner",
-            [did],
+            ["0x" + did],
         )
     }
 
     public async getUpdateAt(did: string): Promise<number> {
 
         const blockNum = await this.call("getUpdateAt",
-            [did],
+            ["0x" + did],
         )
 
         return parseInt(blockNum, 10)

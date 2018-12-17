@@ -2,6 +2,7 @@ import DDO from "../ddo/DDO"
 import MetaData from "../ddo/MetaData"
 import MetaDataBase from "../ddo/MetaDataBase"
 import Service from "../ddo/Service"
+import DID from "../ocean/DID"
 import {Account, Logger, Ocean, ServiceAgreement} from "../squid"
 import config from "./config"
 
@@ -43,7 +44,7 @@ import config from "./config"
 
     const ddo: DDO = await ocean.registerAsset(metaData, publisher)
     Logger.log("did", ddo.id)
-    const assetId = ddo.id.replace("did:op:", "")
+    const did: DID = DID.parse(ddo.id)
 
     const accessService = ddo.findServiceByType("Access")
 
@@ -65,9 +66,9 @@ import config from "./config"
 
     await consumer.requestTokens(metaData.base.price)
 
-    const paid = await serviceAgreement.payAsset(assetId, metaData.base.price, consumer)
+    const paid = await serviceAgreement.payAsset(did.getId(), metaData.base.price, consumer)
     Logger.log(`Asset paid: ${paid}`)
 
-    const accessGranted = await serviceAgreement.grantAccess(assetId, assetId, publisher)
+    const accessGranted = await serviceAgreement.grantAccess(did.getId(), did.getId(), publisher)
     Logger.log(`Asset access granted: ${accessGranted}`)
 })()
