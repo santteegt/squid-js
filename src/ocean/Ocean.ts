@@ -1,4 +1,3 @@
-import {saveAs} from "file-saver"
 import AquariusProvider from "../aquarius/AquariusProvider"
 import SearchQuery from "../aquarius/query/SearchQuery"
 import BrizoProvider from "../brizo/BrizoProvider"
@@ -190,39 +189,13 @@ export default class Ocean {
                 )
                 Logger.log("Completed asset payment, now access should be granted.")
             })
-            const accessEvent: ContractEvent = EventListener.subscribe(
-                accessService.conditions[1].contractName,
-                accessService.conditions[1].events[1].name, {})
-            accessEvent.listenOnce(async (data) => {
-                Logger.log("Awesome; got a AccessGranted Event. Let's download the asset files.")
-                const webConnector = WebServiceConnectorProvider.getConnector()
-                const contentUrls = await SecretStoreProvider.getSecretStore()
-                    .decryptDocument(id, metadataService.metadata.base.contentUrls[0])
-                const serviceUrl: string = accessService.serviceEndpoint
-                Logger.log("Consuming asset files using service url: ", serviceUrl)
-                for (const cUrl of contentUrls) {
-                    let url: string = serviceUrl + `?url=${cUrl}`
-                    url = url + `&serviceAgreementId=${serviceAgreementId}`
-                    url = url + `&consumerAddress=${consumer.getId()}`
-                    Logger.log("Fetching asset from: ", url)
-                    const response: any = await webConnector.get(url)
-                    const buffer: Buffer = await response.buffer()
-                    const parts: string[] = cUrl.split("/")
-                    const filename: string = parts[parts.length - 1]
-                    Logger.debug(`Got response: filename is ${filename}, url is ${response.url}`)
-                    const target = `${__dirname}/downloads/${filename}`
-                    await saveAs([buffer.toString("utf8")], filename)
-                    Logger.log("saved file to:", target)
-                }
-                Logger.log("Done downloading asset files.")
-            })
 
             return {
                 serviceAgreementId,
                 serviceAgreementSignature,
             }
-        } catch (err) {
 
+        } catch (err) {
             Logger.error("Signing ServiceAgreement failed!", err)
         }
     }
@@ -231,8 +204,47 @@ export default class Ocean {
                                             serviceDefinitionId: string,
                                             serviceAgreementId: string,
                                             serviceAgreementSignature: string,
+                                            cb,
                                             consumer: Account) {
-        const result = await BrizoProvider
+
+        const ddo = await AquariusProvider.getAquarius().retrieveDDO(did)
+        const id = did.replace("did:op:", "")
+
+        const accessService: Service = ddo.findServiceByType("Access")
+        const metadataService: Service = ddo.findServiceByType("Metadata")
+
+        const accessEvent: ContractEvent = EventListener.subscribe(
+            accessService.conditions[1].contractName,
+            accessService.conditions[1].events[1].name, {})
+
+        accessEvent.listenOnce(async () => {
+            Logger.log("Awesome; got a AccessGranted Event. Let's download the asset files.")
+            const webConnector = WebServiceConnectorProvider.getConnector()
+            const contentUrls = await SecretStoreProvider
+                .getSecretStore()
+                .decryptDocument(id, metadataService.metadata.base.contentUrls[0])
+            const serviceUrl: string = accessService.serviceEndpoint
+            Logger.log("Consuming asset files using service url: ", serviceUrl)
+            const files = []
+
+            for (const cUrl of contentUrls) {
+                let url: string = serviceUrl + `?url=${cUrl}`
+                url = url + `&serviceAgreementId=${serviceAgreementId}`
+                url = url + `&consumerAddress=${consumer.getId()}`
+                Logger.log("Fetching asset from: ", url)
+                const response: any = await webConnector.get(url)
+                const responseBuffer: Buffer = await response.buffer()
+                const urlParts: string[] = cUrl.split("/")
+                const filename: string = urlParts[urlParts.length - 1]
+                Logger.debug(`Got response: filename is ${filename}, url is ${response.url}`)
+                files.push(responseBuffer.toString("utf8"))
+            }
+            Logger.log("Done downloading asset files.")
+
+            cb(files)
+        })
+
+        await BrizoProvider
             .getBrizo()
             .initializeServiceAgreement(
                 did,
@@ -240,8 +252,6 @@ export default class Ocean {
                 serviceDefinitionId,
                 serviceAgreementSignature,
                 consumer.getId())
-
-        Logger.log(result.status)
     }
 
     public async executeServiceAgreement(did: string,
