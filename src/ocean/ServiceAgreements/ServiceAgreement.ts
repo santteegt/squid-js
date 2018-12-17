@@ -109,6 +109,12 @@ export default class ServiceAgreement extends OceanBase {
             throw new Error(`TemplateId not found in service "${service.type}" ddo.`)
         }
 
+        const templateActive = await serviceAgreement.getTemplateStatus(service.templateId)
+
+        if (!templateActive) {
+            throw new Error(`Template with id ${service.templateId} is not active.`)
+        }
+
         const executeAgreementReceipt = await serviceAgreement
             .executeAgreement(
                 service.templateId,
