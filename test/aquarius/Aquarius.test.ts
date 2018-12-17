@@ -2,7 +2,7 @@ import * as assert from "assert"
 import Aquarius from "../../src/aquarius/Aquarius"
 import SearchQuery from "../../src/aquarius/query/SearchQuery"
 import DDO from "../../src/ddo/DDO"
-import IdGenerator from "../../src/ocean/IdGenerator"
+import DID from "../../src/ocean/DID"
 import WebServiceConnectorProvider from "../../src/utils/WebServiceConnectorProvider"
 import config from "../config"
 import WebServiceConnectorMock from "../mocks/WebServiceConnector.mock"
@@ -85,9 +85,9 @@ describe("Aquarius", () => {
 
         it("should store a ddo", async () => {
 
-            const did: string = `did:op:${IdGenerator.generatePrefixedId()}`
+            const did: DID = DID.generate()
             const ddo: DDO = new DDO({
-                id: did,
+                id: did.getId(),
             })
 
             // @ts-ignore
@@ -103,9 +103,9 @@ describe("Aquarius", () => {
 
         it("should store a ddo", async () => {
 
-            const did: string = `did:op:${IdGenerator.generatePrefixedId()}`
+            const did: DID = DID.generate()
             const ddo: DDO = new DDO({
-                id: did,
+                id: did.getId(),
             })
 
             // @ts-ignore
@@ -114,12 +114,12 @@ describe("Aquarius", () => {
             const storageResult: DDO = await aquarius.storeDDO(ddo)
             assert(storageResult)
 
-            assert(storageResult.id === did)
+            assert(storageResult.id === did.getId())
 
             const restrieveResult: DDO = await aquarius.retrieveDDO(did)
             assert(restrieveResult)
 
-            assert(restrieveResult.id === did)
+            assert(restrieveResult.id === did.getId())
             assert(restrieveResult.id === storageResult.id)
         })
     })

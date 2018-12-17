@@ -1,6 +1,7 @@
 import {URL} from "whatwg-url"
 import DDO from "../ddo/DDO"
 import Config from "../models/Config"
+import DID from "../ocean/DID"
 import Logger from "../utils/Logger"
 import WebServiceConnectorProvider from "../utils/WebServiceConnectorProvider"
 import SearchQuery from "./query/SearchQuery"
@@ -114,8 +115,8 @@ export default class Aquarius {
         return result
     }
 
-    public async retrieveDDO(did: string): Promise<DDO> {
-        const fullUrl = `${this.url}${apiPath}/${did}`
+    public async retrieveDDO(did: DID): Promise<DDO> {
+        const fullUrl = `${this.url}${apiPath}/${did.getDid()}`
         const result = await WebServiceConnectorProvider.getConnector()
             .get(fullUrl)
             .then((response: any) => {
@@ -136,7 +137,7 @@ export default class Aquarius {
         return result
     }
 
-    public getServiceEndpoint(did) {
-        return `${this.url}/api/v1/aquarius/assets/metadata/${did}`
+    public getServiceEndpoint(did: DID) {
+        return `${this.url}/api/v1/aquarius/assets/metadata/${did.getId()}`
     }
 }

@@ -18,14 +18,15 @@ import Config from "../models/Config"
 import ValueType from "../models/ValueType"
 import SecretStoreProvider from "../secretstore/SecretStoreProvider"
 import Logger from "../utils/Logger"
+import WebServiceConnectorProvider from "../utils/WebServiceConnectorProvider"
 import Account from "./Account"
+import DID from "./DID"
 import IdGenerator from "./IdGenerator"
 import ServiceAgreement from "./ServiceAgreements/ServiceAgreement"
 import ServiceAgreementTemplate from "./ServiceAgreements/ServiceAgreementTemplate"
 import Access from "./ServiceAgreements/Templates/Access"
 
 import EventListener from "../keeper/EventListener"
-import WebServiceConnectorProvider from "../utils/WebServiceConnectorProvider"
 
 export default class Ocean {
 
@@ -55,9 +56,10 @@ export default class Ocean {
         return ethAccounts.map((address: string) => new Account(address))
     }
 
-    public async resolveDID(did): Promise<DDO> {
+    public async resolveDID(did: string): Promise<DDO> {
 
-        return AquariusProvider.getAquarius().retrieveDDO(did)
+        const d: DID = DID.parse(did)
+        return AquariusProvider.getAquarius().retrieveDDO(d)
     }
 
     public async registerAsset(metadata: MetaData, publisher: Account): Promise<DDO> {
@@ -66,19 +68,19 @@ export default class Ocean {
         const aquarius = AquariusProvider.getAquarius()
         const brizo = BrizoProvider.getBrizo()
 
-        const assetId: string = IdGenerator.generatePrefixedId()
-        const did: string = `did:op:${assetId}`
+        const did: DID = DID.generate()
         const accessServiceDefinitionId: string = "0"
         const computeServiceDefintionId: string = "1"
         const metadataServiceDefinitionId: string = "2"
 
         metadata.base.contentUrls =
-            [await SecretStoreProvider.getSecretStore().encryptDocument(assetId, metadata.base.contentUrls)]
+            [await SecretStoreProvider.getSecretStore()
+                .encryptDocument(did.getId(), metadata.base.contentUrls)]
 
         const template = new Access()
         const serviceAgreementTemplate = new ServiceAgreementTemplate(template)
 
-        const conditions: Condition[] = await serviceAgreementTemplate.getConditions(metadata, assetId)
+        const conditions: Condition[] = await serviceAgreementTemplate.getConditions(metadata, did.getId())
 
         const serviceEndpoint = aquarius.getServiceEndpoint(did)
 
@@ -86,14 +88,14 @@ export default class Ocean {
         const ddo: DDO = new DDO({
             authentication: [{
                 type: "RsaSignatureAuthentication2018",
-                publicKey: did + "#keys-1",
+                publicKey: did.getDid() + "#keys-1",
             } as Authentication],
-            id: did,
+            id: did.getDid(),
             publicKey: [
                 {
-                    id: did + "#keys-1",
+                    id: did.getDid() + "#keys-1",
                     type: "Ed25519VerificationKey2018",
-                    owner: did,
+                    owner: did.getDid(),
                     publicKeyBase58: await publisher.getPublicKey(),
                 } as PublicKey,
             ],
@@ -143,7 +145,7 @@ export default class Ocean {
         // Logger.log(JSON.stringify(storedDdo, null, 2))
 
         await didRegistry.registerAttribute(
-            assetId,
+            did.getId(),
             ValueType.URL,
             "Metadata",
             serviceEndpoint,
@@ -156,12 +158,12 @@ export default class Ocean {
                                       serviceDefinitionId: string,
                                       consumer: Account): Promise<any> {
 
-        const ddo = await AquariusProvider.getAquarius().retrieveDDO(did)
-        const id = did.replace("did:op:", "")
-        const serviceAgreementId: string = IdGenerator.generatePrefixedId()
+        const d: DID = DID.parse(did as string)
+        const ddo = await AquariusProvider.getAquarius().retrieveDDO(d)
+        const serviceAgreementId: string = IdGenerator.generateId()
 
         try {
-            const serviceAgreementSignature: string = await ServiceAgreement.signServiceAgreement(id,
+            const serviceAgreementSignature: string = await ServiceAgreement.signServiceAgreement(
                 ddo, serviceDefinitionId, serviceAgreementId, consumer)
 
             const accessService: Service = ddo.findServiceByType("Access")
@@ -183,7 +185,7 @@ export default class Ocean {
 
                 const sa: ServiceAgreement = new ServiceAgreement(data.returnValues.serviceAgreementId)
                 await sa.payAsset(
-                    id,
+                    d.getId(),
                     metadataService.metadata.base.price,
                     consumer,
                 )
@@ -207,8 +209,8 @@ export default class Ocean {
                                             cb,
                                             consumer: Account) {
 
-        const ddo = await AquariusProvider.getAquarius().retrieveDDO(did)
-        const id = did.replace("did:op:", "")
+        const d: DID = DID.parse(did)
+        const ddo = await AquariusProvider.getAquarius().retrieveDDO(d)
 
         const accessService: Service = ddo.findServiceByType("Access")
         const metadataService: Service = ddo.findServiceByType("Metadata")
@@ -222,7 +224,7 @@ export default class Ocean {
             const webConnector = WebServiceConnectorProvider.getConnector()
             const contentUrls = await SecretStoreProvider
                 .getSecretStore()
-                .decryptDocument(id, metadataService.metadata.base.contentUrls[0])
+                .decryptDocument(d.getId(), metadataService.metadata.base.contentUrls[0])
             const serviceUrl: string = accessService.serviceEndpoint
             Logger.log("Consuming asset files using service url: ", serviceUrl)
             const files = []
@@ -261,12 +263,12 @@ export default class Ocean {
                                          consumer: Account,
                                          publisher: Account): Promise<ServiceAgreement> {
 
-        const ddo = await AquariusProvider.getAquarius().retrieveDDO(did)
-        const id = did.replace("did:op:", "")
+        const d: DID = DID.parse(did)
+        const ddo = await AquariusProvider.getAquarius().retrieveDDO(d)
 
         const serviceAgreement: ServiceAgreement = await ServiceAgreement
             .executeServiceAgreement(
-                id,
+                d,
                 ddo,
                 serviceDefinitionId,
                 serviceAgreementId,
