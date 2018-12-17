@@ -7,12 +7,12 @@ import Web3Provider from "../../keeper/Web3Provider"
 import ValuePair from "../../models/ValuePair"
 import Logger from "../../utils/Logger"
 import Account from "../Account"
+import DID from "../DID"
 import OceanBase from "../OceanBase"
 
 export default class ServiceAgreement extends OceanBase {
 
-    public static async signServiceAgreement(assetId: string,
-                                             ddo: DDO,
+    public static async signServiceAgreement(ddo: DDO,
                                              serviceDefinitionId: string,
                                              serviceAgreementId: string,
                                              consumer: Account): Promise<string> {
@@ -36,7 +36,7 @@ export default class ServiceAgreement extends OceanBase {
         return serviceAgreementHashSignature
     }
 
-    public static async executeServiceAgreement(assetId: string,
+    public static async executeServiceAgreement(did: DID,
                                                 ddo: DDO,
                                                 serviceDefinitionId: string,
                                                 serviceAgreementId: string,
@@ -54,7 +54,7 @@ export default class ServiceAgreement extends OceanBase {
         const timeoutValues: number[] = ServiceAgreement.getTimeoutValuesFromService(service)
 
         // todo get consumer from ddo
-        const serviceAgreement: ServiceAgreement = await ServiceAgreement.executeAgreement(ddo,
+        const serviceAgreement: ServiceAgreement = await ServiceAgreement.executeAgreement(did, ddo,
             serviceDefinitionId, serviceAgreementId, valueHashes, timeoutValues, serviceAgreementHashSignature,
             consumer.getId(), publisher)
 
@@ -92,7 +92,8 @@ export default class ServiceAgreement extends OceanBase {
         return serviceAgreementHashSignature
     }
 
-    private static async executeAgreement(ddo: DDO,
+    private static async executeAgreement(did: DID,
+                                          ddo: DDO,
                                           serviceDefinitionId: string,
                                           serviceAgreementId: string,
                                           valueHashes: string[],
@@ -123,7 +124,7 @@ export default class ServiceAgreement extends OceanBase {
                 valueHashes,
                 timeoutValues,
                 serviceAgreementId,
-                ddo.id,
+                did,
                 publisher.getId())
 
         if (executeAgreementReceipt.events.ExecuteAgreement.returnValues.state === false) {

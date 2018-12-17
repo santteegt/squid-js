@@ -1,5 +1,6 @@
 import {Receipt} from "web3-utils"
 import MethodReflection from "../../models/MethodReflection"
+import DID from "../../ocean/DID"
 import ContractBase from "./ContractBase"
 
 export default class ServiceAgreement extends ContractBase {
@@ -44,12 +45,12 @@ export default class ServiceAgreement extends ContractBase {
 
     public async executeAgreement(serviceAgreementTemplateId: string, serviceAgreementSignatureHash: string,
                                   consumerAddress: string, valueHashes: string[], timeoutValues: number[],
-                                  serviceAgreementId: string, did: string, publisherAddress: string):
+                                  serviceAgreementId: string, did: DID, publisherAddress: string):
         Promise<Receipt> {
 
         return this.send("executeAgreement", publisherAddress, [
             serviceAgreementTemplateId, serviceAgreementSignatureHash, consumerAddress, valueHashes,
-            timeoutValues, "0x" + serviceAgreementId, "0x" + did.replace("did:op:", ""),
+            timeoutValues, "0x" + serviceAgreementId, "0x" + did.getId(),
         ])
     }
 }

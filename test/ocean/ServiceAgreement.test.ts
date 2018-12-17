@@ -5,6 +5,7 @@ import DDO from "../../src/ddo/DDO"
 import MetaData from "../../src/ddo/MetaData"
 import Service from "../../src/ddo/Service"
 import Account from "../../src/ocean/Account"
+import DID from "../../src/ocean/DID"
 import IdGenerator from "../../src/ocean/IdGenerator"
 import Ocean from "../../src/ocean/Ocean"
 import ServiceAgreement from "../../src/ocean/ServiceAgreements/ServiceAgreement"
@@ -23,7 +24,7 @@ let consumerAccount: Account
 let accessService: Service
 let metaDataService: Service
 
-const assetId: string = IdGenerator.generateId()
+const did: DID = DID.generate()
 
 describe("ServiceAgreement", () => {
 
@@ -40,7 +41,7 @@ describe("ServiceAgreement", () => {
         const serviceAgreementTemplate: ServiceAgreementTemplate =
             new ServiceAgreementTemplate(new Access())
 
-        const conditions: Condition[] = await serviceAgreementTemplate.getConditions(metadata, assetId)
+        const conditions: Condition[] = await serviceAgreementTemplate.getConditions(metadata, did.getId())
 
         accessService = {
             type: "Access",
@@ -58,15 +59,14 @@ describe("ServiceAgreement", () => {
     describe("#signServiceAgreement()", () => {
         it("should sign an service agreement", async () => {
 
-            const did: string = `did:op:${assetId}`
-            const ddo = new DDO({id: did, service: [accessService]})
+            const ddo = new DDO({id: did.getDid(), service: [accessService]})
             const serviceAgreementId: string = IdGenerator.generateId()
 
             // @ts-ignore
             WebServiceConnectorProvider.setConnector(new WebServiceConnectorMock(ddo))
 
             const serviceAgreementSignature: string =
-                await ServiceAgreement.signServiceAgreement(assetId, ddo, accessService.serviceDefinitionId,
+                await ServiceAgreement.signServiceAgreement(ddo, accessService.serviceDefinitionId,
                     serviceAgreementId, consumerAccount)
 
             assert(serviceAgreementSignature)
@@ -78,43 +78,41 @@ describe("ServiceAgreement", () => {
     describe("#executeServiceAgreement()", () => {
         it("should execute an service agreement", async () => {
 
-            const did: string = `did:op:${assetId}`
-            const ddo = new DDO({id: did, service: [accessService]})
+            const ddo = new DDO({id: did.getDid(), service: [accessService]})
             const serviceAgreementId: string = IdGenerator.generateId()
 
             // @ts-ignore
             WebServiceConnectorProvider.setConnector(new WebServiceConnectorMock(ddo))
             const serviceAgreementSignature: string =
-                await ServiceAgreement.signServiceAgreement(assetId, ddo, accessService.serviceDefinitionId,
+                await ServiceAgreement.signServiceAgreement(ddo, accessService.serviceDefinitionId,
                     serviceAgreementId, consumerAccount)
 
             const serviceAgreement: ServiceAgreement =
-                await ServiceAgreement.executeServiceAgreement(assetId, ddo, accessService.serviceDefinitionId,
+                await ServiceAgreement.executeServiceAgreement(did, ddo, accessService.serviceDefinitionId,
                     serviceAgreementId, serviceAgreementSignature, consumerAccount, publisherAccount)
             assert(serviceAgreement)
 
             const serviceDefinitionId = serviceAgreement.getId()
             assert(serviceDefinitionId)
-            assert(serviceDefinitionId !== did)
+            assert(serviceDefinitionId !== did.getId())
         })
     })
 
     describe("#getStatus()", () => {
         it("should get the status of a newly created service agreement", async () => {
 
-            const did: string = `did:op:${assetId}`
-            const ddo = new DDO({id: did, service: [accessService]})
+            const ddo = new DDO({id: did.getDid(), service: [accessService]})
             const serviceAgreementId: string = IdGenerator.generateId()
 
             // @ts-ignore
             WebServiceConnectorProvider.setConnector(new WebServiceConnectorMock(ddo))
             const serviceAgreementSignature: string =
-                await ServiceAgreement.signServiceAgreement(assetId, ddo, accessService.serviceDefinitionId,
+                await ServiceAgreement.signServiceAgreement(ddo, accessService.serviceDefinitionId,
                     serviceAgreementId, consumerAccount)
             assert(serviceAgreementSignature)
 
             const serviceAgreement: ServiceAgreement =
-                await ServiceAgreement.executeServiceAgreement(assetId, ddo, accessService.serviceDefinitionId,
+                await ServiceAgreement.executeServiceAgreement(did, ddo, accessService.serviceDefinitionId,
                     serviceAgreementId, serviceAgreementSignature, consumerAccount, publisherAccount)
             assert(serviceAgreement)
 
@@ -126,27 +124,26 @@ describe("ServiceAgreement", () => {
     describe("#payAsset()", () => {
         it("should lock the payment in that service agreement", async () => {
 
-            const did: string = `did:op:${assetId}`
-            const ddo = new DDO({id: did, service: [accessService, metaDataService]})
+            const ddo = new DDO({id: did.getDid(), service: [accessService, metaDataService]})
             const serviceAgreementId: string = IdGenerator.generateId()
 
             // @ts-ignore
             WebServiceConnectorProvider.setConnector(new WebServiceConnectorMock(ddo))
 
             const serviceAgreementSignature: string =
-                await ServiceAgreement.signServiceAgreement(assetId, ddo, accessService.serviceDefinitionId,
+                await ServiceAgreement.signServiceAgreement(ddo, accessService.serviceDefinitionId,
                     serviceAgreementId, consumerAccount)
             assert(serviceAgreementSignature)
 
             const serviceAgreement: ServiceAgreement =
-                await ServiceAgreement.executeServiceAgreement(assetId, ddo, accessService.serviceDefinitionId,
+                await ServiceAgreement.executeServiceAgreement(did, ddo, accessService.serviceDefinitionId,
                     serviceAgreementId, serviceAgreementSignature, consumerAccount, publisherAccount)
             assert(serviceAgreement)
 
             // get funds
             await consumerAccount.requestTokens(metaDataService.metadata.base.price)
 
-            const paid: boolean = await serviceAgreement.payAsset(assetId, metaDataService.metadata.base.price,
+            const paid: boolean = await serviceAgreement.payAsset(did.getId(), metaDataService.metadata.base.price,
                 consumerAccount)
             assert(paid)
         })
@@ -155,54 +152,54 @@ describe("ServiceAgreement", () => {
     describe("#grantAccess()", () => {
         it("should grant access in that service agreement", async () => {
 
-            const did: string = `did:op:${assetId}`
-            const ddo = new DDO({id: did, service: [accessService]})
+            const ddo = new DDO({id: did.getDid(), service: [accessService]})
             const serviceAgreementId: string = IdGenerator.generateId()
 
             // @ts-ignore
             WebServiceConnectorProvider.setConnector(new WebServiceConnectorMock(ddo))
             const serviceAgreementSignature: string =
-                await ServiceAgreement.signServiceAgreement(assetId, ddo, accessService.serviceDefinitionId,
+                await ServiceAgreement.signServiceAgreement(ddo, accessService.serviceDefinitionId,
                     serviceAgreementId, consumerAccount)
             assert(serviceAgreementSignature)
 
             const serviceAgreement: ServiceAgreement =
-                await ServiceAgreement.executeServiceAgreement(assetId, ddo, accessService.serviceDefinitionId,
+                await ServiceAgreement.executeServiceAgreement(did, ddo, accessService.serviceDefinitionId,
                     serviceAgreementId, serviceAgreementSignature, consumerAccount, publisherAccount)
             assert(serviceAgreement)
 
             // get funds
             await consumerAccount.requestTokens(metaDataService.metadata.base.price)
 
-            const paid: boolean = await serviceAgreement.payAsset(assetId, metaDataService.metadata.base.price,
+            const paid: boolean = await serviceAgreement.payAsset(did.getId(), metaDataService.metadata.base.price,
                 consumerAccount)
             assert(paid)
 
             // todo: use document id
-            const accessGranted: boolean = await serviceAgreement.grantAccess(assetId, assetId, publisherAccount)
+            const accessGranted: boolean = await serviceAgreement.grantAccess(did.getId(), did.getId(),
+                publisherAccount)
             assert(accessGranted)
         })
 
         it("should fail to grant grant access if there is no payment", async () => {
 
-            const did: string = `did:op:${assetId}`
-            const ddo = new DDO({id: did, service: [accessService]})
+            const ddo = new DDO({id: did.getDid(), service: [accessService]})
             const serviceAgreementId: string = IdGenerator.generateId()
 
             // @ts-ignore
             WebServiceConnectorProvider.setConnector(new WebServiceConnectorMock(ddo))
             const serviceAgreementSignature: string =
-                await ServiceAgreement.signServiceAgreement(assetId, ddo, accessService.serviceDefinitionId,
+                await ServiceAgreement.signServiceAgreement(ddo, accessService.serviceDefinitionId,
                     serviceAgreementId, consumerAccount)
             assert(serviceAgreementSignature)
 
             const serviceAgreement: ServiceAgreement =
-                await ServiceAgreement.executeServiceAgreement(assetId, ddo, accessService.serviceDefinitionId,
+                await ServiceAgreement.executeServiceAgreement(did, ddo, accessService.serviceDefinitionId,
                     serviceAgreementId, serviceAgreementSignature, consumerAccount, publisherAccount)
             assert(serviceAgreement)
 
             // todo: use document id
-            const accessGranted: boolean = await serviceAgreement.grantAccess(assetId, assetId, publisherAccount)
+            const accessGranted: boolean = await serviceAgreement.grantAccess(did.getId(), did.getId(),
+                publisherAccount)
             assert(!accessGranted)
         })
     })

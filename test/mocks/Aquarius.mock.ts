@@ -1,5 +1,6 @@
 import Aquarius from "../../src/aquarius/Aquarius"
 import DDO from "../../src/ddo/DDO"
+import DID from "../../src/ocean/DID"
 
 const ddoStore: Map<string, any> = new Map<string, any>()
 
@@ -14,7 +15,7 @@ export default class AquariusMock extends Aquarius {
         return ddo
     }
 
-    public async retrieveDDO(did: string): Promise<DDO> {
-        return ddoStore.get(did)
+    public async retrieveDDO(did: DID): Promise<DDO> {
+        return ddoStore.get(did.getDid())
     }
 }
