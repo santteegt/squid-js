@@ -5,6 +5,10 @@ import ServiceAgreementTemplate from "./ocean/ServiceAgreements/ServiceAgreement
 import Access from "./ocean/ServiceAgreements/Templates/Access"
 import FitchainCompute from "./ocean/ServiceAgreements/Templates/FitchainCompute"
 import Logger from "./utils/Logger"
+import WebServiceConnectorProvider from "./utils/WebServiceConnectorProvider"
+import SecretStoreProvider from "./secretstore/SecretStoreProvider"
+import IdGenerator from "./ocean/IdGenerator"
+import DID from './ocean/DID'
 
 import EventListener from "./keeper/EventListener"
 
@@ -17,5 +21,9 @@ export {
     Logger,
     Templates,
     Account,
+    IdGenerator,
+    DID,
     EventListener,
+    WebServiceConnectorProvider,
+    SecretStoreProvider,
 }
