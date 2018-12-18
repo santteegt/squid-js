@@ -86,8 +86,14 @@ export default class ServiceAgreement extends OceanBase {
             valueHashes,
             timeoutValues)
 
-        const serviceAgreementHashSignature = await Web3Provider
-            .getWeb3().eth.sign(serviceAgreementHash, consumer.getId())
+        let serviceAgreementHashSignature: string
+        const web3 = Web3Provider.getWeb3()
+        if (web3.currentProvider.isMetaMask) {
+            // password is injected by metamask, dont try to set it!
+            serviceAgreementHashSignature = await web3.eth.personal.sign(serviceAgreementHash, consumer.getId(), null)
+        } else {
+            serviceAgreementHashSignature = await web3.eth.sign(serviceAgreementHash, consumer.getId())
+        }
 
         return serviceAgreementHashSignature
     }
