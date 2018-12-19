@@ -23,11 +23,11 @@ before_script:
 
 script:
   - npm run test:cover
+  - npm run report-coverage
   - npm run build
   - npm run doc
 
 after_script:
-  - npm run report-coverage
   - greenkeeper-lockfile-upload
 
 notifications:
