@@ -1,42 +1,43 @@
 language: node_js
 node_js:
-- "10"
+  - "10"
 
 services:
-- docker
+  - docker
 
 cache:
   directories:
-  - node_modules
+    - node_modules
 
 matrix:
   fast_finish: true
 
 before_install:
-- npm install -g npm
-- npm install -g release-it greenkeeper-lockfile ganache-cli@~6.1.8
+  - npm install -g npm
+  - npm install -g codacy-coverage release-it greenkeeper-lockfile ganache-cli@~6.1.8
 
 before_script:
-- greenkeeper-lockfile-update
-- ganache-cli > ganache-cli.log &
-- sleep 2
+  - greenkeeper-lockfile-update
+  - ganache-cli > ganache-cli.log &
+  - sleep 2
 
 script:
-- npm run test:cover
-- npm run build
-- npm run doc
+  - npm run test:cover
+  - npm run build
+  - npm run doc
 
 after_script:
-- greenkeeper-lockfile-upload
+  - npm run report-coverage
+  - greenkeeper-lockfile-upload
 
 notifications:
   email: false
 
 deploy:
-- provider: npm
-  email: "devops@oceanprotocol.com"
-  api_key: ${NPM_TOKEN}
-  skip_cleanup: true
-  on:
-    tags: true
+  - provider: npm
+    email: "devops@oceanprotocol.com"
+    api_key: ${NPM_TOKEN}
+    skip_cleanup: true
+    on:
+      tags: true
 
