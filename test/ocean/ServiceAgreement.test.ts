@@ -96,6 +96,21 @@ describe("ServiceAgreement", () => {
             assert(serviceDefinitionId)
             assert(serviceDefinitionId !== did.getId())
         })
+
+        it("should throw on invalid sig", (done) => {
+
+            const ddo = new DDO({id: did.getDid(), service: [accessService]})
+            const serviceAgreementId: string = IdGenerator.generateId()
+
+            // @ts-ignore
+            WebServiceConnectorProvider.setConnector(new WebServiceConnectorMock(ddo))
+
+            ServiceAgreement.executeServiceAgreement(did, ddo, accessService.serviceDefinitionId,
+                serviceAgreementId, "0x00", consumerAccount, publisherAccount)
+                .catch((err) => {
+                    done()
+                })
+        })
     })
 
     describe("#getStatus()", () => {
