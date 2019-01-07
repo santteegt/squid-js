@@ -109,6 +109,8 @@ npm run test:cover
 
 This will start a watcher for changes of the code.
 
+`ganache-cli` can be installed following [this instructions](https://github.com/trufflesuite/ganache-cli#installation).
+
 ### Production build
 
 ```bash
