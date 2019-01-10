@@ -8,9 +8,20 @@ import OceanToken from "./contracts/Token"
 
 import Web3Provider from "./Web3Provider"
 
+/**
+ * Interface with Ocean Keeper contracts.
+ * Ocean Keeper implementation where we put the following modules together:
+ * - TCRs: users create challenges and resolve them through voting to maintain registries.
+ * - Ocean Tokens: the intrinsic tokens circulated inside Ocean network, which is used in the voting of TCRs.
+ * - Marketplace: the core marketplace where people can transact with each other with Ocean tokens.
+ */
 export default class Keeper {
 
-    public static async getInstance() {
+    /**
+     * Returns Keeper instance.
+     * @return {Promise<Keeper>}
+     */
+    public static async getInstance(): Promise<Keeper> {
 
         if (Keeper.instance === null) {
             Keeper.instance = new Keeper()
@@ -26,16 +37,58 @@ export default class Keeper {
         return Keeper.instance
     }
 
+    /**
+     * Keeper instance.
+     * @type {Keeper}
+     */
     private static instance: Keeper = null
 
+    /**
+     * Ocean Token smart contract instance.
+     * @type {OceanToken}
+     */
     public token: OceanToken
+
+    /**
+     * Ocean Market smart contract instance.
+     * @type {OceanMarket}
+     */
     public market: OceanMarket
+
+    /**
+     * Ocean Auth smart contract instance.
+     * @type {OceanAuth}
+     */
     public auth: OceanAuth
+
+    /**
+     * Service agreement smart contract instance.
+     * @type {ServiceAgreement}
+     */
     public serviceAgreement: ServiceAgreement
+
+    /**
+     * Access conditions smart contract instance.
+     * @type {AccessConditions}
+     */
     public accessConditions: AccessConditions
+
+    /**
+     * Payment conditions smart contract instance.
+     * @type {PaymentConditions}
+     */
     public paymentConditions: PaymentConditions
+
+    /**
+     * DID registry smart contract instance.
+     * @type {DIDRegistry}
+     */
     public didRegistry: DIDRegistry
 
+    /**
+     * Returns the network by name.
+     * @return {Promise<string>} Network name.
+     */
     public async getNetworkName(): Promise<string> {
         return Web3Provider.getWeb3().eth.net.getId()
             .then((networkId) => {

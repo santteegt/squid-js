@@ -3,11 +3,14 @@ import WebServiceConnectorProvider from "../utils/WebServiceConnectorProvider"
 
 const apiPath = "/api/v1/brizo/services"
 
+/**
+ * Provides a interface with Brizo.
+ * Brizo is the technical component executed by the Publishers allowing to them to provide extended data services.
+ */
 export default class Brizo {
     private url: string
 
     constructor(config: Config) {
-
         this.url = config.brizoUri
     }
 

@@ -1,8 +1,11 @@
-import fetch from "node-fetch"
+import fetch, { Response, RequestInit, BodyInit } from "node-fetch"
 
+/**
+ * Provides a common interface to web services.
+ */
 export default class WebServiceConnector {
 
-    public async post(url, payload): Promise<any> {
+    public async post(url: string, payload: BodyInit): Promise<Response> {
         return this.fetch(url, {
             method: "POST",
             body: payload,
@@ -12,7 +15,7 @@ export default class WebServiceConnector {
         })
     }
 
-    public async get(url): Promise<any> {
+    public async get(url: string): Promise<Response> {
         return this.fetch(url, {
             method: "GET",
             headers: {
@@ -21,7 +24,7 @@ export default class WebServiceConnector {
         })
     }
 
-    public async put(url, payload): Promise<any> {
+    public async put(url: string, payload: BodyInit): Promise<Response> {
         return this.fetch(url, {
             method: "PUT",
             body: payload,
@@ -31,7 +34,7 @@ export default class WebServiceConnector {
         })
     }
 
-    private async fetch(url, opts): Promise<any> {
+    private async fetch(url: string, opts: RequestInit): Promise<Response> {
         return fetch(url, opts)
     }
 }

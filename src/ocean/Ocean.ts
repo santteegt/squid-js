@@ -27,10 +27,17 @@ import Access from "./ServiceAgreements/Templates/Access"
 
 import EventListener from "../keeper/EventListener"
 
+/**
+ * Main interface for Ocean Protocol.
+ */
 export default class Ocean {
 
-    public static async getInstance(config: Config) {
-
+    /**
+     * Returns the instance of Ocean.
+     * @param  {Config} config Ocean instance configuration.
+     * @return {Promise<Ocean>}
+     */
+    public static async getInstance(config: Config): Promise<Ocean> {
         if (!Ocean.instance) {
             ConfigProvider.setConfig(config)
             Ocean.instance = new Ocean()
@@ -40,13 +47,25 @@ export default class Ocean {
         return Ocean.instance
     }
 
-    private static instance = null
+    /**
+     * Ocean instance.
+     * @type {Ocean}
+     */
+    private static instance: Ocean = null
 
+    /**
+     * Keeper instance.
+     * @type {Keeper}
+     */
     private keeper: Keeper
 
     private constructor() {
     }
 
+    /**
+     * Returns the list of accounts.
+     * @return {Promise<Account[]>}
+     */
     public async getAccounts(): Promise<Account[]> {
 
         // retrieve eth accounts
@@ -55,12 +74,22 @@ export default class Ocean {
         return ethAccounts.map((address: string) => new Account(address))
     }
 
+    /**
+     * Returns a DDO by DID.
+     * @param  {string} did Decentralized ID.
+     * @return {Promise<DDO>}
+     */
     public async resolveDID(did: string): Promise<DDO> {
-
         const d: DID = DID.parse(did)
         return AquariusProvider.getAquarius().retrieveDDO(d)
     }
 
+    /**
+     * Registers a new DDO.
+     * @param  {MetaData} metadata DDO metadata.
+     * @param  {Account} publisher Publicher account.
+     * @return {Promise<DDO>}
+     */
     public async registerAsset(metadata: MetaData, publisher: Account): Promise<DDO> {
 
         const {didRegistry} = this.keeper
@@ -153,6 +182,13 @@ export default class Ocean {
         return storedDdo
     }
 
+    /**
+     * Signs a service agreement by DID.
+     * @param  {string} did Decentralized ID.
+     * @param  {string} serviceDefinitionId Service definition ID.
+     * @param  {Account} consumer Consumer account.
+     * @return {Promise<any>}
+     */
     public async signServiceAgreement(did: string,
                                       serviceDefinitionId: string,
                                       consumer: Account): Promise<any> {
@@ -201,6 +237,15 @@ export default class Ocean {
         }
     }
 
+    /**
+     * Creates a new service agreement.
+     * @param {string} did Decentralized ID.
+     * @param {string} serviceDefinitionId Service definition ID.
+     * @param {string} serviceAgreementId Service agreement ID.
+     * @param {string} serviceAgreementSignature Service agreement signature.
+     * @param {Function} cb Callback executen when the access is granted.
+     * @param {Account} consumer Consumer account.
+     */
     public async initializeServiceAgreement(did: string,
                                             serviceDefinitionId: string,
                                             serviceAgreementId: string,
@@ -247,6 +292,16 @@ export default class Ocean {
                 consumer.getId())
     }
 
+    /**
+     * Executes a service agreement.
+     * @param  {string} did Decentralized ID.
+     * @param  {string} serviceDefinitionId Service definition ID.
+     * @param  {string} serviceAgreementId Service agreement ID.
+     * @param  {string} serviceAgreementSignature Service agreement signature.
+     * @param  {Account} consumer Consumer account.
+     * @param  {Account} publisher Publisher account.
+     * @return {Promise<ServiceAgreement>}
+     */
     public async executeServiceAgreement(did: string,
                                          serviceDefinitionId: string,
                                          serviceAgreementId: string,
@@ -270,10 +325,21 @@ export default class Ocean {
         return serviceAgreement
     }
 
+    /**
+     * Search over the assets using a query.
+     * @param  {SearchQuery} query Query to filter the assets.
+     * @return {Promise<DDO[]>}
+     */
     public async searchAssets(query: SearchQuery): Promise<DDO[]> {
         return AquariusProvider.getAquarius().queryMetadata(query)
     }
 
+
+    /**
+     * Search over the assets using a keyword.
+     * @param  {SearchQuery} text Text to filter the assets.
+     * @return {Promise<DDO[]>}
+     */
     public async searchAssetsByText(text: string): Promise<DDO[]> {
         return AquariusProvider.getAquarius().queryMetadataByText({
             text,

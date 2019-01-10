@@ -58,11 +58,8 @@ export default class MetaData {
     public curation: Curation
 
     constructor(metaData?: MetaData) {
-        this.additionalInformation = metaData ?
-            metaData.additionalInformation ? metaData.additionalInformation :
-                additionalInformation : additionalInformation
-        this.base = metaData ? metaData.base ? metaData.base : base : base
-        this.curation = metaData ? metaData.curation ? metaData.curation : curation : curation
+        this.additionalInformation = (metaData && metaData.additionalInformation) || additionalInformation
+        this.base = (metaData && metaData.base) || base
+        this.curation = (metaData && metaData.curation) || curation
     }
-
 }

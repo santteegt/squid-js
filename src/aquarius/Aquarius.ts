@@ -8,17 +8,18 @@ import SearchQuery from "./query/SearchQuery"
 
 const apiPath = "/api/v1/aquarius/assets/ddo"
 
+/**
+ * Provides a interface with Aquarius.
+ * Aquarius provides an off-chain database store for metadata about data assets.
+ */
 export default class Aquarius {
-
     private url: string
 
     constructor(config: Config) {
-
         this.url = config.aquariusUri
     }
 
     public async getAccessUrl(accessToken: any, payload: any): Promise<string> {
-
         const accessUrl: string = await WebServiceConnectorProvider.getConnector()
             .post(`${accessToken.service_endpoint}/${accessToken.resource_id}`, payload)
             .then((response: any): string => {
@@ -40,8 +41,12 @@ export default class Aquarius {
         return accessUrl
     }
 
+    /**
+     * Search over the DDOs using a query.
+     * @param  {SearchQuery} query Query to filter the DDOs.
+     * @return {Promise<DDO[]>}
+     */
     public async queryMetadata(query: SearchQuery): Promise<DDO[]> {
-
         const result: DDO[] = await WebServiceConnectorProvider.getConnector()
             .post(`${this.url}${apiPath}/query`, JSON.stringify(query))
             .then((response: any) => {
@@ -64,8 +69,12 @@ export default class Aquarius {
         return result
     }
 
+    /**
+     * Search over the DDOs using a query.
+     * @param  {SearchQuery} query Query to filter the DDOs.
+     * @return {Promise<DDO[]>}
+     */
     public async queryMetadataByText(query: SearchQuery): Promise<DDO[]> {
-
         const fullUrl = new URL(`${this.url}${apiPath}/query`)
         fullUrl.searchParams.append("text", query.text)
         fullUrl.searchParams.append("sort", decodeURIComponent(JSON.stringify(query.sort)))
@@ -93,6 +102,11 @@ export default class Aquarius {
         return result
     }
 
+    /**
+     * Stores a DDO in Aquarius.
+     * @param  {DDO} ddo DDO to be stored.
+     * @return {Promise<DDO>} Final DDO.
+     */
     public async storeDDO(ddo: DDO): Promise<DDO> {
         const fullUrl = `${this.url}${apiPath}`
         const result: DDO = await WebServiceConnectorProvider.getConnector()
@@ -115,6 +129,11 @@ export default class Aquarius {
         return result
     }
 
+    /**
+     * Retrieves a DDO by DID.
+     * @param  {DID} did DID of the asset.
+     * @return {Promise<DDO>} DDO of the asset.
+     */
     public async retrieveDDO(did: DID): Promise<DDO> {
         const fullUrl = `${this.url}${apiPath}/${did.getDid()}`
         const result = await WebServiceConnectorProvider.getConnector()

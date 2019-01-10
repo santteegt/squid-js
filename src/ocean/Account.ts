@@ -5,13 +5,24 @@ import Web3Provider from "../keeper/Web3Provider"
 import Balance from "../models/Balance"
 import OceanBase from "./OceanBase"
 
+/**
+ * Account information.
+ */
 export default class Account extends OceanBase {
     private balance: Balance
 
+    /**
+     * Balance of Ocean Token.
+     * @return {Promise<number>}
+     */
     public async getOceanBalance(): Promise<number> {
         return (await Keeper.getInstance()).token.balanceOf(this.id)
     }
 
+    /**
+     * Balance of Ether.
+     * @return {Promise<number>}
+     */
     public async getEtherBalance(): Promise<number> {
         // Logger.log("getting balance for", account);
         return Web3Provider
@@ -24,6 +35,10 @@ export default class Account extends OceanBase {
             })
     }
 
+    /**
+     * Balances of Ether and Ocean Token.
+     * @return {Promise<Balance>}
+     */
     public async getBalance(): Promise<Balance> {
 
         if (!this.balance) {
@@ -36,6 +51,11 @@ export default class Account extends OceanBase {
         return this.balance
     }
 
+    /**
+     * Request Ocean Tokens.
+     * @param  {number} amount Tokens to be requested.
+     * @return {Promise<number>}
+     */
     public async requestTokens(amount: number): Promise<number> {
         await (await Keeper.getInstance())
             .market
@@ -43,6 +63,10 @@ export default class Account extends OceanBase {
         return amount
     }
 
+    /**
+     * Returns the account public key.
+     * @return {Promise<string>}
+     */
     public async getPublicKey(): Promise<string> {
 
         const web3 = Web3Provider.getWeb3()
