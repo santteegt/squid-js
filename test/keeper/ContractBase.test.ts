@@ -11,7 +11,9 @@ let accounts: Account[]
 
 describe("ContractWrapperBase", () => {
 
-    before(async () => {
+    before(async function() {
+        this.timeout(2 * 60 * 1000)
+
         ConfigProvider.setConfig(config)
         await TestContractHandler.prepareContracts()
         await wrappedContract.initMock()

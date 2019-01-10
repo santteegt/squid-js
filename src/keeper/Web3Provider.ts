@@ -4,6 +4,14 @@ import ConfigProvider from "../ConfigProvider"
 export default class Web3Provider {
 
     /**
+     * Set a Web3 instance.
+     * @param {Web3} Web3 New Web3 instance.
+     */
+    public static setWeb3(web3: Web3) {
+        Web3Provider.web3 = web3
+    }
+
+    /**
      * Returns Web3 instance.
      * @return {Web3}
      */

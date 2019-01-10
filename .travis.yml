@@ -14,12 +14,15 @@ matrix:
 
 before_install:
   - npm install -g npm
-  - npm install -g codacy-coverage release-it greenkeeper-lockfile ganache-cli@~6.1.8
+  - npm install -g codacy-coverage release-it greenkeeper-lockfile
 
 before_script:
   - greenkeeper-lockfile-update
-  - ganache-cli > ganache-cli.log &
-  - sleep 2
+  - git clone https://github.com/oceanprotocol/barge
+  - cd barge
+  - bash -x start_ocean.sh --latest --no-brizo --no-pleuston --local-spree-node 2>&1 > start_ocean.log &
+  - cd ..
+  - ./scripts/wait_for_migration_and_extract_keeper_artifacts.sh
 
 script:
   - npm run test:cover

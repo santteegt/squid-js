@@ -5,10 +5,12 @@ import ServiceAgreementTemplate from "../../src/ocean/ServiceAgreements/ServiceA
 import Access from "../../src/ocean/ServiceAgreements/Templates/Access"
 import FitchainCompute from "../../src/ocean/ServiceAgreements/Templates/FitchainCompute"
 import Logger from "../../src/utils/Logger"
+import Web3MockProvider from "../mocks/Web3MockProvider.mock"
 
 export default class TestContractHandler extends ContractHandler {
 
     public static async prepareContracts() {
+        Web3Provider.setWeb3(Web3MockProvider.getWeb3Mock())
 
         const web3 = Web3Provider.getWeb3()
         const deployerAddress = (await web3.eth.getAccounts())[0]

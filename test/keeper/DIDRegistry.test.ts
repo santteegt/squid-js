@@ -9,6 +9,7 @@ import Ocean from "../../src/ocean/Ocean"
 import Logger from "../../src/utils/Logger"
 import config from "../config"
 import TestContractHandler from "./TestContractHandler"
+import Web3MockProvider from "../mocks/Web3MockProvider.mock"
 
 let ocean: Ocean
 let didRegistry: DIDRegistry
@@ -16,6 +17,7 @@ let didRegistry: DIDRegistry
 describe("DIDRegistry", () => {
 
     before(async () => {
+        Web3Provider.setWeb3(Web3MockProvider.getWeb3Mock())
         ConfigProvider.setConfig(config)
         await TestContractHandler.prepareContracts()
         ocean = await Ocean.getInstance(config)
