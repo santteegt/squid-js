@@ -77,4 +77,6 @@ import config from "./config"
 
     Logger.log("ServiceAgreement Id:", serviceAgreementResult.serviceAgreementId)
     Logger.log("ServiceAgreement Signature:", serviceAgreementResult.serviceAgreementSignature)
+
+    process.exit(0)
 })()

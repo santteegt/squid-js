@@ -71,4 +71,6 @@ import config from "./config"
 
     const accessGranted = await serviceAgreement.grantAccess(did.getId(), did.getId(), publisher)
     Logger.log(`Asset access granted: ${accessGranted}`)
+
+    process.exit(0)
 })()

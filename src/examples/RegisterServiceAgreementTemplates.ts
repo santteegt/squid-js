@@ -2,7 +2,6 @@ import {Account, Logger, Ocean, ServiceAgreementTemplate, Templates} from "../sq
 import config from "./config"
 
 (async () => {
-
     const ocean: Ocean = await Ocean.getInstance(config)
 
     const templateOwner: Account = (await ocean.getAccounts())[0]
@@ -12,4 +11,6 @@ import config from "./config"
 
     Logger.log("ServiceAgreementTemplate registered:", serviceAgreementRegistered,
         "templateId:", serviceAgreementTemplate.getId())
+
+    process.exit(0)
 })()
