@@ -1,3 +1,5 @@
+import deprecated from 'deprecated-decorator';
+
 import AquariusProvider from "../aquarius/AquariusProvider"
 import SearchQuery from "../aquarius/query/SearchQuery"
 import BrizoProvider from "../brizo/BrizoProvider"
@@ -76,10 +78,21 @@ export default class Ocean {
 
     /**
      * Returns a DDO by DID.
+     * @deprecated Replace by {@link #resolveAssetDID}
      * @param  {string} did Decentralized ID.
      * @return {Promise<DDO>}
      */
+    @deprecated('resolveAssetDID')
     public async resolveDID(did: string): Promise<DDO> {
+        return await this.resolveAssetDID(did);
+    }
+
+    /**
+     * Returns a DDO by DID.
+     * @param  {string} did Decentralized ID.
+     * @return {Promise<DDO>}
+     */
+    public async resolveAssetDID(did: string): Promise<DDO> {
         const d: DID = DID.parse(did)
         return AquariusProvider.getAquarius().retrieveDDO(d)
     }
@@ -91,7 +104,6 @@ export default class Ocean {
      * @return {Promise<DDO>}
      */
     public async registerAsset(metadata: MetaData, publisher: Account): Promise<DDO> {
-
         const {didRegistry} = this.keeper
         const aquarius = AquariusProvider.getAquarius()
         const brizo = BrizoProvider.getBrizo()
@@ -184,14 +196,34 @@ export default class Ocean {
 
     /**
      * Signs a service agreement by DID.
+     * @deprecated Replace by {@link #purchaseAssetService}
+     * @param  {string} did Decentralized ID.
+     * @param  {string} serviceDefinitionId Service definition ID.
+     * @param  {Account} consumer Consumer account.
+     * @return {Promise<any>}
+     * 
+     */
+    @deprecated('purchaseAssetService')
+    public async signServiceAgreement(
+        did: string,
+        serviceDefinitionId: string,
+        consumer: Account,
+    ): Promise<any> {
+        return await this.purchaseAssetService(did, serviceDefinitionId, consumer);
+    }
+
+    /**
+     * Signs a service agreement by DID.
      * @param  {string} did Decentralized ID.
      * @param  {string} serviceDefinitionId Service definition ID.
      * @param  {Account} consumer Consumer account.
      * @return {Promise<any>}
      */
-    public async signServiceAgreement(did: string,
-                                      serviceDefinitionId: string,
-                                      consumer: Account): Promise<any> {
+    public async purchaseAssetService(
+        did: string,
+        serviceDefinitionId: string,
+        consumer: Account,
+    ): Promise<any> {
 
         const d: DID = DID.parse(did as string)
         const ddo = await AquariusProvider.getAquarius().retrieveDDO(d)
@@ -239,6 +271,7 @@ export default class Ocean {
 
     /**
      * Creates a new service agreement.
+     * @private
      * @param {string} did Decentralized ID.
      * @param {string} serviceDefinitionId Service definition ID.
      * @param {string} serviceAgreementId Service agreement ID.
@@ -246,13 +279,14 @@ export default class Ocean {
      * @param {Function} cb Callback executen when the access is granted.
      * @param {Account} consumer Consumer account.
      */
-    public async initializeServiceAgreement(did: string,
-                                            serviceDefinitionId: string,
-                                            serviceAgreementId: string,
-                                            serviceAgreementSignature: string,
-                                            cb,
-                                            consumer: Account) {
-
+    public async initializeServiceAgreement(
+        did: string,
+        serviceDefinitionId: string,
+        serviceAgreementId: string,
+        serviceAgreementSignature: string,
+        cb: (files: string[]) => void,
+        consumer: Account,
+    ) {
         const d: DID = DID.parse(did)
         const ddo = await AquariusProvider.getAquarius().retrieveDDO(d)
 
@@ -302,13 +336,14 @@ export default class Ocean {
      * @param  {Account} publisher Publisher account.
      * @return {Promise<ServiceAgreement>}
      */
-    public async executeServiceAgreement(did: string,
-                                         serviceDefinitionId: string,
-                                         serviceAgreementId: string,
-                                         serviceAgreementSignature: string,
-                                         consumer: Account,
-                                         publisher: Account): Promise<ServiceAgreement> {
-
+    public async executeServiceAgreement(
+        did: string,
+        serviceDefinitionId: string,
+        serviceAgreementId: string,
+        serviceAgreementSignature: string,
+        consumer: Account,
+        publisher: Account,
+    ): Promise<ServiceAgreement> {
         const d: DID = DID.parse(did)
         const ddo = await AquariusProvider.getAquarius().retrieveDDO(d)
 
