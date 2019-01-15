@@ -29,7 +29,6 @@ script:
   - npm run report-coverage
   - npm run build
   - npm run doc
-  # - ./scripts/wait_for_migration_and_extract_keeper_artifacts.sh
   - ./src/examples/fire_lazers.sh
 
 after_script:
