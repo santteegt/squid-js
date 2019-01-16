@@ -7,4 +7,6 @@ import config from "./config"
     const accounts = await ocean.getAccounts()
 
     Logger.log(JSON.stringify(accounts, null, 2))
+
+    process.exit(0)
 })()

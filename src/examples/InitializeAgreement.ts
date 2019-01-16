@@ -67,4 +67,5 @@ import config from "./config"
             consumer,
         )
 
+    process.exit(0)
 })()

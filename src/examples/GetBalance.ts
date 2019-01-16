@@ -7,4 +7,6 @@ import config from "./config"
     const accounts = await ocean.getAccounts()
 
     Logger.log(await accounts[0].getBalance())
+
+    process.exit(0)
 })()

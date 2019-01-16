@@ -14,4 +14,6 @@ import config from "./config"
     })
 
     Logger.log(names.length, names)
+
+    process.exit(0)
 })()

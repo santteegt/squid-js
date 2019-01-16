@@ -68,4 +68,6 @@ import config from "./config"
 
     const paid = await serviceAgreement.payAsset(did.getId(), metaData.base.price, consumer)
     Logger.log(`Asset paid: ${paid}`)
+
+    process.exit(0)
 })()

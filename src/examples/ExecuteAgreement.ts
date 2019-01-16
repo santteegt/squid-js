@@ -6,7 +6,6 @@ import {Account, Logger, Ocean, ServiceAgreement} from "../squid"
 import config from "./config"
 
 (async () => {
-
     const ocean: Ocean = await Ocean.getInstance(config)
 
     const publisher: Account = (await ocean.getAccounts())[0]
@@ -65,4 +64,5 @@ import config from "./config"
         publisher)
     Logger.log("ServiceAgreement Id:", serviceAgreement.getId())
 
+    process.exit(0)
 })()

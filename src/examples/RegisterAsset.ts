@@ -5,7 +5,6 @@ import {Account, Logger, Ocean} from "../squid"
 import config from "./config"
 
 (async () => {
-
     const ocean: Ocean = await Ocean.getInstance(config)
 
     const publisher: Account = (await ocean.getAccounts())[0]
@@ -42,4 +41,6 @@ import config from "./config"
 
     const ddo: DDO = await ocean.registerAsset(metaData, publisher)
     Logger.log(ddo.id)
+
+    process.exit(0)
 })()
