@@ -4,12 +4,15 @@ import * as config from "./config/config.json"
 
 if (process.env.SEED_WORDS) {
     const seedphrase = process.env.SEED_WORDS
+    // There are 20 accounts availabe (19 + 1)
+    const accountIndex = Math.floor(Math.random() ** 19)
 
     // @ts-ignore
     config.web3Provider = new HDWalletProvider(
         seedphrase,
         config.nodeUri,
-        0, 10,
+        accountIndex,
+        2,
     )
 }
 
