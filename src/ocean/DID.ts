@@ -15,7 +15,7 @@ export default class DID {
     public static parse(didString: string): DID {
         let did: DID
         const didMatch = didString.match(/^did:op:([a-f0-9]{64})$/i)
-        
+
         if (didMatch) {
             did = new DID(didMatch[1])
         }
